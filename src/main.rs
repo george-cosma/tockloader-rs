@@ -1,7 +1,7 @@
 mod cli;
 use cli::make_cli;
 
-fn main() {
+fn _main() {
     let matches = make_cli().get_matches();
 
     if matches.get_flag("debug") {
