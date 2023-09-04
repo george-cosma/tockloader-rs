@@ -15,7 +15,8 @@ pub struct LineCodec;
 
 impl LineCodec {
     fn clean_input(input: &str) -> String {
-        input.replace('\n', "\r\n")
+        // input.replace('\n', "\r\n")
+        input.to_string()
     }
 }
 
