@@ -9,8 +9,8 @@ use tokio_util::codec::{Decoder, Encoder, Framed};
 
 use bytes::{Buf, BufMut, BytesMut};
 use console::Term;
-use tokio_serial::{SerialPortBuilderExt, SerialPort};
 use tokio_serial::SerialStream;
+use tokio_serial::{SerialPort, SerialPortBuilderExt};
 
 pub struct LineCodec;
 
@@ -111,7 +111,6 @@ pub fn open_port(path: String, baud_rate: u32) -> tokio_serial::Result<SerialStr
 }
 
 pub async fn run_terminal(mut stream: SerialStream) {
-
     // stream.set_baud_rate(1200).unwrap();
     // tokio::time::sleep(Duration::from_millis(5000)).await;
     // stream.set_baud_rate(115200).unwrap();
@@ -159,19 +158,20 @@ pub async fn read_from_serial(
     // TODO: What if there is another instance of tockloader open? Check the python implementation
 
     loop {
-    while let Some(line_result) = reader.next().await {
-        let line = match line_result {
-            Ok(it) => it,
-            Err(err) => {
-                eprint!("Failed to read string. Error: {:?}", err);
-                return Err(Box::new(err));
-            }
-        };
-        dbg!("{}", line);
+        while let Some(line_result) = reader.next().await {
+            let line = match line_result {
+                Ok(it) => it,
+                Err(err) => {
+                    eprint!("Failed to read string. Error: {:?}", err);
+                    return Err(Box::new(err));
+                }
+            };
+            dbg!("{}", line);
 
-        // We need to flush the buffer because the "tock>" prompt does not have a newline.
-        io::stdout().flush().unwrap();
-    }}
+            // We need to flush the buffer because the "tock>" prompt does not have a newline.
+            io::stdout().flush().unwrap();
+        }
+    }
 
     Ok(())
 }
@@ -179,7 +179,6 @@ pub async fn read_from_serial(
 pub async fn write_to_serial(
     mut writer: SplitSink<Framed<SerialStream, LineCodec>, Vec<u8>>,
 ) -> Result<(), Box<dyn Error>> {
-
     // writer.send(vec![0x00, 0xFC, 0x05, 0x2, 0xFC, 0x14]).await.unwrap();
     writer.send(vec![0xFC, 0x1]).await.unwrap();
     loop {
