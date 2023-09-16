@@ -2,13 +2,14 @@ use futures::stream::{SplitSink, SplitStream, StreamExt};
 use futures::SinkExt;
 use std::error::Error;
 use std::io::Write;
+use std::time::Duration;
 use std::{io, str};
 
 use tokio_util::codec::{Decoder, Encoder, Framed};
 
 use bytes::{Buf, BufMut, BytesMut};
 use console::Term;
-use tokio_serial::SerialPortBuilderExt;
+use tokio_serial::{SerialPortBuilderExt, SerialPort};
 use tokio_serial::SerialStream;
 
 pub struct LineCodec;
@@ -25,6 +26,7 @@ impl Decoder for LineCodec {
     type Error = io::Error;
 
     fn decode(&mut self, source: &mut BytesMut) -> Result<Option<Self::Item>, Self::Error> {
+        dbg!(&source);
         if source.is_empty() {
             return Ok(None);
         }
@@ -64,11 +66,11 @@ impl Decoder for LineCodec {
     }
 }
 
-impl Encoder<String> for LineCodec {
+impl Encoder<Vec<u8>> for LineCodec {
     type Error = io::Error;
 
-    fn encode(&mut self, _item: String, _dst: &mut BytesMut) -> Result<(), Self::Error> {
-        _dst.put(_item.as_bytes());
+    fn encode(&mut self, _item: Vec<u8>, _dst: &mut BytesMut) -> Result<(), Self::Error> {
+        _dst.put(&_item[..]);
         Ok(())
     }
 }
@@ -108,7 +110,20 @@ pub fn open_port(path: String, baud_rate: u32) -> tokio_serial::Result<SerialStr
     tokio_serial::new(path, baud_rate).open_native_async()
 }
 
-pub async fn run_terminal(stream: SerialStream) {
+pub async fn run_terminal(mut stream: SerialStream) {
+
+    // stream.set_baud_rate(1200).unwrap();
+    // tokio::time::sleep(Duration::from_millis(5000)).await;
+    // stream.set_baud_rate(115200).unwrap();
+    // stream.write_data_terminal_ready(true).unwrap();
+    // stream.write_request_to_send(true).unwrap();
+    // tokio::time::sleep(Duration::from_millis(5000)).await;
+    // stream.write_data_terminal_ready(false).unwrap();
+    // tokio::time::sleep(Duration::from_millis(5000)).await;
+    // stream.write_request_to_send(false).unwrap();
+
+    dbg!("Ready");
+
     let (writer, reader) = LineCodec.framed(stream).split();
     let read_handle = tokio::spawn(async move {
         if read_from_serial(reader).await.is_err() {
@@ -128,6 +143,7 @@ pub async fn run_terminal(stream: SerialStream) {
         result = read_handle => {
             // The write handle cannot be aborrted because of the blocking task spawned in it.
             // As such, I think we are pretty much safe to forcefully exit at this point.
+            dbg!(&result);
             match result {
                 Ok(_) => std::process::exit(0),
                 Err(_) => std::process::exit(1),
@@ -142,6 +158,7 @@ pub async fn read_from_serial(
 ) -> Result<(), Box<dyn Error>> {
     // TODO: What if there is another instance of tockloader open? Check the python implementation
 
+    loop {
     while let Some(line_result) = reader.next().await {
         let line = match line_result {
             Ok(it) => it,
@@ -150,57 +167,62 @@ pub async fn read_from_serial(
                 return Err(Box::new(err));
             }
         };
-        print!("{}", line);
+        dbg!("{}", line);
 
         // We need to flush the buffer because the "tock>" prompt does not have a newline.
         io::stdout().flush().unwrap();
-    }
+    }}
 
     Ok(())
 }
 
 pub async fn write_to_serial(
-    mut writer: SplitSink<Framed<SerialStream, LineCodec>, std::string::String>,
+    mut writer: SplitSink<Framed<SerialStream, LineCodec>, Vec<u8>>,
 ) -> Result<(), Box<dyn Error>> {
+
+    // writer.send(vec![0x00, 0xFC, 0x05, 0x2, 0xFC, 0x14]).await.unwrap();
+    writer.send(vec![0xFC, 0x1]).await.unwrap();
     loop {
-        let console_input = tokio::task::spawn_blocking(move || Term::stdout().read_key()).await?;
-
-        let key = console_input?;
-
-        let send_buffer: Option<String> = match key {
-            console::Key::Unknown => None,
-            console::Key::UnknownEscSeq(_) => None,
-            console::Key::ArrowLeft => Some("\u{1B}[D".into()),
-            console::Key::ArrowRight => Some("\u{1B}[C".into()),
-            console::Key::ArrowUp => Some("\u{1B}[A".into()),
-            console::Key::ArrowDown => Some("\u{1B}[B".into()),
-            console::Key::Enter => Some("\n".into()),
-            console::Key::Escape => None,
-            console::Key::Backspace => Some("\x08".into()),
-            console::Key::Home => Some("\u{1B}[H".into()),
-            console::Key::End => Some("\u{1B}[F".into()),
-            console::Key::Tab => Some("\t".into()),
-            console::Key::BackTab => Some("\t".into()),
-            console::Key::Alt => None,
-            console::Key::Del => Some("\x7f".into()),
-            console::Key::Shift => None,
-            console::Key::Insert => None,
-            console::Key::PageUp => None,
-            console::Key::PageDown => None,
-            console::Key::Char(c) => Some(c.into()),
-            _ => todo!(),
-        };
-
-        if let Some(buffer) = send_buffer {
-            if let Err(err) = writer.send(buffer.clone()).await {
-                eprintln!(
-                    "Error writing to serial. Buffer {}. Error: {:?} ",
-                    buffer, err
-                );
-                return Err(Box::new(err));
-            }
-        }
+        tokio::time::sleep(Duration::from_secs(200)).await;
     }
+    //     let console_input = tokio::task::spawn_blocking(move || Term::stdout().read_key()).await?;
+
+    //     let key = console_input?;
+
+    //     let send_buffer: Option<String> = match key {
+    //         console::Key::Unknown => None,
+    //         console::Key::UnknownEscSeq(_) => None,
+    //         console::Key::ArrowLeft => Some("\u{1B}[D".into()),
+    //         console::Key::ArrowRight => Some("\u{1B}[C".into()),
+    //         console::Key::ArrowUp => Some("\u{1B}[A".into()),
+    //         console::Key::ArrowDown => Some("\u{1B}[B".into()),
+    //         console::Key::Enter => Some("\n".into()),
+    //         console::Key::Escape => None,
+    //         console::Key::Backspace => Some("\x08".into()),
+    //         console::Key::Home => Some("\u{1B}[H".into()),
+    //         console::Key::End => Some("\u{1B}[F".into()),
+    //         console::Key::Tab => Some("\t".into()),
+    //         console::Key::BackTab => Some("\t".into()),
+    //         console::Key::Alt => None,
+    //         console::Key::Del => Some("\x7f".into()),
+    //         console::Key::Shift => None,
+    //         console::Key::Insert => None,
+    //         console::Key::PageUp => None,
+    //         console::Key::PageDown => None,
+    //         console::Key::Char(c) => Some(c.into()),
+    //         _ => todo!(),
+    //     };
+
+    //     if let Some(buffer) = send_buffer {
+    //         if let Err(err) = writer.send(buffer.clone()).await {
+    //             eprintln!(
+    //                 "Error writing to serial. Buffer {}. Error: {:?} ",
+    //                 buffer, err
+    //             );
+    //             return Err(Box::new(err));
+    //         }
+    //     }
+    // }
 
     // TODO: handle CTRL+C
     // Ok(())
