@@ -76,6 +76,8 @@ impl VirtualTerminal for SerialInterface {
             }
         };
 
+        Term::stdout().unblock()?;
+
         // Arc::into_innter will always return Mutex<SplitSink/SplitStream> because the previous select statement
         // will always make sure all the closures are either finished or cancelled and the arc is cloned nowhere else.
         // We can move out of the mutex for similar reasons, no one else will need this reader/writer.
