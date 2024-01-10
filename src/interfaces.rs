@@ -12,6 +12,7 @@ pub mod traits;
 #[enum_dispatch(BoardInterface)]
 #[enum_dispatch(VirtualTerminal)]
 #[enum_dispatch(BootloaderInterface)]
+#[derive(Debug)]
 pub enum Interface {
     Serial(SerialInterface),
     OpenOCD(OpenOCDInterface),

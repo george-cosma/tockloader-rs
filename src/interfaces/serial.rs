@@ -8,6 +8,7 @@ use tokio_serial::SerialStream;
 
 use crate::errors::TockloaderError;
 
+#[derive(Debug)]
 pub struct SerialInterface {
     port: String,
     baud_rate: u32,

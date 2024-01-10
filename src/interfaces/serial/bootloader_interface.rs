@@ -22,10 +22,12 @@ impl BootloaderInterface for SerialInterface {
             return Err(TockloaderError::StreamClosed);
         }
 
+        println!("Checkpoint 1");
         // Method 0: We are already in bootloader mode
         if self.bootloader_open().await {
             return Ok(true);
         }
+        println!("Checkpoint 2");
 
         // Method 1: Change baud rate to 1200 and change back.
         // TODO: When does this work?
@@ -36,9 +38,12 @@ impl BootloaderInterface for SerialInterface {
             .map_err(TockloaderError::TokioSeriallError)?;
         tokio::time::sleep(Duration::from_millis(1000)).await;
 
+        println!("Checkpoint 3");
+
         if self.bootloader_open().await {
             return Ok(true);
         }
+        println!("Checkpoint 4");
 
         self.stream
             .as_mut()
@@ -46,6 +51,7 @@ impl BootloaderInterface for SerialInterface {
             .set_baud_rate(self.baud_rate)
             .map_err(TockloaderError::TokioSeriallError)?;
         tokio::time::sleep(Duration::from_millis(1000)).await;
+        println!("Checkpoint 5");
 
         // Method 2: DTR & RTS
         // > Use the DTR and RTS lines on UART to reset the chip and assert the
@@ -60,6 +66,8 @@ impl BootloaderInterface for SerialInterface {
             .write_data_terminal_ready(true)
             .map_err(TockloaderError::TokioSeriallError)?;
 
+        println!("Checkpoint 6");
+
         // > Set RTS to make the SAM4L go into bootloader mode
         self.stream
             .as_mut()
@@ -68,6 +76,8 @@ impl BootloaderInterface for SerialInterface {
             .map_err(TockloaderError::TokioSeriallError)?;
 
         tokio::time::sleep(Duration::from_millis(100)).await;
+
+        println!("Checkpoint 7");
 
         // > Let the SAM4L startup
         self.stream
@@ -79,11 +89,16 @@ impl BootloaderInterface for SerialInterface {
         // > make sure the bootloader enters bootloader mode
         tokio::time::sleep(Duration::from_millis(500)).await;
 
+        println!("Checkpoint 8");
+
         self.stream
             .as_mut()
             .unwrap()
             .write_request_to_send(false)
             .map_err(TockloaderError::TokioSeriallError)?;
+
+
+        println!("Checkpoint 9");
 
         if self.bootloader_open().await {
             return Ok(true);

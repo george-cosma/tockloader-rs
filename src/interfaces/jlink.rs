@@ -6,6 +6,7 @@ pub mod board_interface;
 pub mod bootloader_interface;
 pub mod virtual_terminal;
 
+#[derive(Debug)]
 pub struct JLinkInterface {}
 
 impl JLinkInterface {

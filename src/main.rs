@@ -34,6 +34,7 @@ async fn run() -> Result<(), TockloaderError> {
         Some(("info", sub_matches)) => {
             let mut interface = build_interface(sub_matches)?;
             interface.open()?;
+            dbg!(&interface);
             if !interface.enter_bootloader().await? {
                 println!("Couldn't enter bootloader automatically. Please try entering it manually and press any key...");
                 // Read a single byte and discard
@@ -42,6 +43,7 @@ async fn run() -> Result<(), TockloaderError> {
                     return Err(TockloaderError::BootloaderNotOpen);
                 }
             }
+            println!("Entered bootloader");
             for i in 0..16 {
                 let attribute = interface.get_attribute(i).await?;
                 println!("{}: {} = {:?}", i, attribute.key, attribute.value);
