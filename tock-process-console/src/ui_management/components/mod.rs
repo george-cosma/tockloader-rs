@@ -1,4 +1,5 @@
 pub mod input_box;
+mod output_box;
 // pub mod output_box;
 pub use input_box::InputBox;
 
