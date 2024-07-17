@@ -1,7 +1,6 @@
-# This Makefile has been inspired by 'tock'
-# Link to their Makefile here: https://github.com/tock/tock/blob/master/Makefile
-# Naming scheme and conventions have been lifted from thier "Code Review" policy set.
-# Reference: https://github.com/tock/tock/blob/master/doc/CodeReview.md#3-continuous-integration
+# Licensed under the Apache License, Version 2.0 or the MIT License.
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+# Copyright OXIDOS AUTOMOTIVE 2024.
 
 .PHONY: ci-job-format
 ci-job-format:

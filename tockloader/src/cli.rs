@@ -1,3 +1,7 @@
+// Licensed under the Apache License, Version 2.0 or the MIT License.
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+// Copyright OXIDOS AUTOMOTIVE 2024.
+
 use clap::{arg, crate_version, value_parser, Command};
 
 /// Create the [command](clap::Command) object which will handle all of the command line arguments.
