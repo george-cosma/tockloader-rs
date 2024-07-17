@@ -8,12 +8,12 @@ use ratatui::{
 };
 use tokio::sync::mpsc::UnboundedSender;
 
-pub struct output_box<T>{
+pub struct output_box<T> {
     content: Vec<T>,
 }
 
-impl<T> output_box<T>{
-    pub fn content(&self) -> &Vec<T>{
+impl<T> output_box<T> {
+    pub fn content(&self) -> &Vec<T> {
         &self.content
     }
 
@@ -24,9 +24,6 @@ impl<T> output_box<T>{
     pub fn clear(&mut self) {
         self.content.clear();
     }
-
-    
-
 }
 
 pub struct RenderProperties {
@@ -56,4 +53,3 @@ pub struct RenderProperties {
 //         }
 //     }
 // }
-

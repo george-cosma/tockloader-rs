@@ -25,7 +25,11 @@ impl ConnectionHandler {
         tty: &str,
     ) -> Result<(UnboundedReceiver<Event>, UnboundedSender<Bytes>), Error> {
         let mut port: SerialStream = tokio_serial::new(tty, 115200).open_native_async()?;
-        port.set_exclusive(false)?;
+
+        if cfg!(unix) {
+            port.set_exclusive(false)?;
+        }
+
         let (port_reader, port_writer) = split(port);
 
         let (event_writer, event_reader) = mpsc::unbounded_channel::<Event>();

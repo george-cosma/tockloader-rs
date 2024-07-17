@@ -40,8 +40,7 @@ fn get_app_args() -> Vec<clap::Arg> {
 fn get_channel_args() -> Vec<clap::Arg> {
     vec![
         arg!(-p --port <PORT> "The serial port or device name to use"),
-        arg!(--serial "Use the serial bootloader to flash")
-            .action(clap::ArgAction::SetTrue),
+        arg!(--serial "Use the serial bootloader to flash").action(clap::ArgAction::SetTrue),
         // -----
         arg!(--"flash-file" "Operate on a binary flash file instead of a proper board")
             .action(clap::ArgAction::SetTrue),

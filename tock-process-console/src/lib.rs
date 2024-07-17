@@ -7,7 +7,7 @@ use state_store::StateStore;
 use termination::{create_terminator, Interrupted};
 use ui_management::UiManager;
 
-pub async extern fn run() ->  anyhow::Result<()> {
+pub async fn run() -> anyhow::Result<()> {
     let (terminator, mut interrupt_reader) = create_terminator();
     let (state_store, state_reader) = StateStore::new();
     let (ui_manager, action_reader) = UiManager::new();
@@ -28,18 +28,3 @@ pub async extern fn run() ->  anyhow::Result<()> {
 
     Ok(())
 }
-
-
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        print!("it works!");
-    }
-}
-
-
-

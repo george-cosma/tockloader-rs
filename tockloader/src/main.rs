@@ -10,7 +10,6 @@ use tokio::time::sleep;
 
 use tock_process_console;
 
-
 #[tokio::main]
 async fn main() -> Result<(), TockloaderError> {
     let result = run().await;
@@ -34,10 +33,11 @@ async fn run() -> Result<(), TockloaderError> {
             // interface.open()?;
             sleep(Duration::new(5, 0)).await;
 
-            let _= match tock_process_console::run().await
-            {
-                Ok(()) => {},
-                Err(_) => {print!("cli bricked!")},
+            let _ = match tock_process_console::run().await {
+                Ok(()) => {}
+                Err(_) => {
+                    print!("cli bricked!")
+                }
             };
             // interface.run_terminal().await?;
         }

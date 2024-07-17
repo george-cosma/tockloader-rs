@@ -40,8 +40,9 @@ impl fmt::Display for CLIError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CLIError::MultipleInterfaces => {
-                f.write_str("At most one of the following tranport interfaces may be used: '--serial'")
-            },
+                //f.write_str("")
+                todo!("TODO (github-username-here): Do we need still need this error?")
+            }
         }
     }
 }

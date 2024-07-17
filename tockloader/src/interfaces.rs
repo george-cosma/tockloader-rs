@@ -9,12 +9,11 @@ pub mod traits;
 #[enum_dispatch(BoardInterface)]
 #[enum_dispatch(VirtualTerminal)]
 pub enum Interface {
-    Serial(SerialInterface)
+    Serial(SerialInterface),
 }
 
 pub fn build_interface(args: &ArgMatches) -> Result<Interface, TockloaderError> {
-    if args.get_flag("serial") as u8 > 1
-    {
+    if args.get_flag("serial") as u8 > 1 {
         return Err(TockloaderError::CLIError(CLIError::MultipleInterfaces));
     }
 
