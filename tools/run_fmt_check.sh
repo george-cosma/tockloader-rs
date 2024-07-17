@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# Script (heavily) inspired by 'tock'
-# Reference: https://github.com/tock/tock/blob/master/tools/run_cargo_fmt.sh
 
 let FAIL=0
 

@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# Script (heavily) inspired by 'tock'
-# Reference: https://github.com/tock/tock/blob/master/tools/run_clippy.sh
 
 # Check to see if we can execute `cargo clippy`.
 # We don't want to force an installation onto the user, so for we
