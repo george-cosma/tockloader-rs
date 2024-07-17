@@ -31,10 +31,10 @@ impl SerialInterface {
                 // todo!("Make user choose out of multiple available ports")
                 for n in 0..available_ports.len()
                 {
-                    println!("port [{}]: {:?},\n", n, available_ports[n])
+                    println!("port [{}]: {:?},\n", n, available_ports[n])clean_port_path(available_ports[15].port_name.clone())
                 }
 
-                //clean_port_path(available_ports[15].port_name.clone())
+                clean_port_path(available_ports[15].port_name.clone())
             }
         };
 

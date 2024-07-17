@@ -36,26 +36,24 @@ pub struct RenderProperties {
     pub show_cursor: bool,
 }
 
-impl ComponentRender<RenderProperties> for output_box {
-    fn render(&self, frame: &mut ratatui::prelude::Frame, properties: RenderProperties) {
-        let output = Paragraph::new(for n in 0..content.len({
+// impl ComponentRender<RenderProperties> for output_box {
+//     fn render(&self, frame: &mut ratatui::prelude::Frame, properties: RenderProperties) {
+//         // let output = Paragraph::new()!todo("all serial ports displayed");)
+//             .style(Style::default().fg(Color::Cyan))
+//             .block(
+//                 Block::default()
+//                     .borders(Borders::ALL)
+//                     .fg(properties.border_color)
+//                     .title(properties.title),
+//             );
+//         frame.render_widget(input, properties.area);
 
-        }))
-            .style(Style::default().fg(Color::Cyan))
-            .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .fg(properties.border_color)
-                    .title(properties.title),
-            );
-        frame.render_widget(input, properties.area);
-
-        if properties.show_cursor {
-            frame.set_cursor(
-                properties.area.x + self.cursor_position as u16 + 1,
-                properties.area.y + 1,
-            )
-        }
-    }
-}
+//         if properties.show_cursor {
+//             frame.set_cursor(
+//                 properties.area.x + self.cursor_position as u16 + 1,
+//                 properties.area.y + 1,
+//             )
+//         }
+//     }
+// }
 
