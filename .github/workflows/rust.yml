@@ -19,6 +19,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Install libudev
+      run:  sudo apt-get install -y  libudev-dev
     - name: Build
       run: cargo build --verbose
     - name: Run tests
@@ -45,5 +47,7 @@ jobs:
       with:
         toolchain: stable
         components: clippy
+    - name: Install libudev
+      run:  sudo apt-get install -y  libudev-dev
     - name: ci-job-clippy
       run:  make ci-job-clippy
