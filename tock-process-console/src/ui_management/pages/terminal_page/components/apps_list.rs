@@ -17,11 +17,12 @@ use ratatui::{
     text::{Line, Span},
     widgets::{Block, Borders, List, ListItem, ListState},
 };
-use std::{fs::OpenOptions, io::Write};
 use tokio::sync::mpsc::UnboundedSender;
 
 #[derive(Clone)]
 struct AppState {
+    // TODO(NegrilaRares): investigate if we need port
+    #[allow(dead_code)]
     pub pid: String,
     pub name: String,
     pub has_new_input: bool,
@@ -92,7 +93,7 @@ impl AppsList {
         self.list_state.select(Some(index));
     }
 
-    pub(super) fn apps(&self) -> &Vec<AppState> {
+    fn apps(&self) -> &Vec<AppState> {
         &self.properties.apps
     }
 
@@ -184,7 +185,7 @@ pub struct RenderProperties {
 }
 
 impl ComponentRender<RenderProperties> for AppsList {
-    fn render(&self, frame: &mut ratatui::prelude::Frame, properties: RenderProperties) {
+    fn render(&mut self, frame: &mut ratatui::prelude::Frame, properties: RenderProperties) {
         let active_application = self.active_app.clone();
 
         let apps_list: Vec<ListItem> = self

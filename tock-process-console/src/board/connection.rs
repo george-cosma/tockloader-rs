@@ -30,9 +30,8 @@ impl ConnectionHandler {
     ) -> Result<(UnboundedReceiver<Event>, UnboundedSender<Bytes>), Error> {
         let mut port: SerialStream = tokio_serial::new(tty, 115200).open_native_async()?;
 
-        if cfg!(unix) {
-            port.set_exclusive(false)?;
-        }
+        #[cfg(unix)]
+        port.set_exclusive(false)?;
 
         let (port_reader, port_writer) = split(port);
 
@@ -87,12 +86,10 @@ impl ConnectionHandler {
                             Some(board_message) => {
                                 let app_name = if board_message.is_app {
                                     format!("app_{}", board_message.pid)
+                                } else if board_message.pid == 0 {
+                                    String::from("debug")
                                 } else {
-                                    if board_message.pid == 0 {
-                                        String::from("debug")
-                                    } else {
-                                        String::from("kernel")
-                                    }
+                                    String::from("kernel")
                                 };
 
                                 let _ = self.event_writer.send(

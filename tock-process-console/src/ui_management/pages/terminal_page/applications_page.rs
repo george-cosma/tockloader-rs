@@ -24,7 +24,7 @@ use ratatui::{
     text::{Line, Span, Text},
     widgets::{Block, Borders, Paragraph},
 };
-use std::{collections::HashMap, fs::OpenOptions, io::Write};
+use std::collections::HashMap;
 use tokio::sync::mpsc::UnboundedSender;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -143,6 +143,8 @@ impl ApplicationsPage {
         self.currently_hovered_section = Section::try_from(previous_idx).unwrap();
     }
 
+    // TODO(NegrilaRares): investigate if we need port
+    #[allow(dead_code)]
     fn calculate_border_color(&self, section: Section) -> Color {
         match (
             self.active_section.as_ref(),
@@ -161,6 +163,8 @@ impl ApplicationsPage {
         self.active_section = None;
     }
 
+    // TODO(NegrilaRares): investigate if we need port
+    #[allow(dead_code)]
     pub fn set_screen_idx(&mut self, index: usize) {
         self.screen_idx = index;
 
@@ -262,7 +266,11 @@ impl Component for ApplicationsPage {
 const NO_APP_SELECTED_MESSAE: &str = "Select an process to see its logs!";
 
 impl ComponentRender<apps_list::RenderProperties> for ApplicationsPage {
-    fn render(&self, frame: &mut ratatui::prelude::Frame, properties: apps_list::RenderProperties) {
+    fn render(
+        &mut self,
+        frame: &mut ratatui::prelude::Frame,
+        properties: apps_list::RenderProperties,
+    ) {
         let [container_active_app_header, container_content] = *Layout::default()
             .direction(Direction::Vertical)
             .constraints([Constraint::Length(4), Constraint::Min(1)].as_ref())

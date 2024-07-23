@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
-use std::fs::OpenOptions;
-use std::io::Write;
 use tokio::sync::mpsc::UnboundedSender;
 
 pub struct BoardMessage {

@@ -88,7 +88,7 @@ impl Component for AppRouter {
 }
 
 impl ComponentRender<()> for AppRouter {
-    fn render(&self, frame: &mut ratatui::prelude::Frame, properties: ()) {
+    fn render(&mut self, frame: &mut ratatui::prelude::Frame, properties: ()) {
         match self.active_page {
             ActivePage::SetupPage => self.setup_page.render(frame, properties),
             ActivePage::MainPage => self.main_page.render(frame, properties),

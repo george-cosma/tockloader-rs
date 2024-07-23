@@ -7,7 +7,11 @@ use core::fmt;
 #[derive(Debug)]
 pub enum TockloaderError {
     TokioSeriallError(tokio_serial::Error),
+    // TODO(NegrilaRares): investigate if we need port
+    #[allow(dead_code)]
     NoPortAvailable,
+    // TODO(NegrilaRares): investigate if we need port
+    #[allow(dead_code)]
     CLIError(CLIError),
     IOError(std::io::Error),
     JoinError(tokio::task::JoinError),
@@ -15,6 +19,8 @@ pub enum TockloaderError {
 
 #[derive(Debug)]
 pub enum CLIError {
+    // TODO(NegrilaRares): investigate if we need port
+    #[allow(dead_code)]
     MultipleInterfaces,
 }
 
@@ -41,7 +47,7 @@ impl fmt::Display for TockloaderError {
 }
 
 impl fmt::Display for CLIError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CLIError::MultipleInterfaces => {
                 //f.write_str("")

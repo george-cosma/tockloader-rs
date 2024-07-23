@@ -5,7 +5,6 @@
 use circular_queue::CircularQueue;
 use std::{
     collections::HashMap,
-    fs::OpenOptions,
     sync::{Arc, Mutex},
 };
 use tui_term::vt100::Parser;
@@ -56,8 +55,14 @@ impl AppData {
 pub enum BoardConnectionStatus {
     Uninitialized,
     Connecting,
-    Connected { port: String },
-    Errored { err: String },
+    // TODO(NegrilaRares): investigate if we need port
+    #[allow(dead_code)]
+    Connected {
+        port: String,
+    },
+    Errored {
+        err: String,
+    },
 }
 
 /// State struct is holding the state of the entire application

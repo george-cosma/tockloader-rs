@@ -16,6 +16,8 @@ pub enum Interface {
     Serial(SerialInterface),
 }
 
+// TODO(NegrilaRares): investigate if we need port
+#[allow(dead_code)]
 pub fn build_interface(args: &ArgMatches) -> Result<Interface, TockloaderError> {
     if args.get_flag("serial") as u8 > 1 {
         return Err(TockloaderError::CLIError(CLIError::MultipleInterfaces));

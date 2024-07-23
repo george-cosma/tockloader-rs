@@ -28,5 +28,5 @@ pub trait Component {
 }
 
 pub trait ComponentRender<Properties> {
-    fn render(&self, frame: &mut Frame, properties: Properties);
+    fn render(&mut self, frame: &mut Frame, properties: Properties);
 }

@@ -8,7 +8,6 @@ use crate::{
     termination::{Interrupted, Terminator},
 };
 use bytes::Bytes;
-use std::{fs::OpenOptions, io::Write};
 use tokio::sync::{
     broadcast,
     mpsc::{self, UnboundedReceiver, UnboundedSender},
@@ -60,7 +59,7 @@ impl StateStore {
                             if !state.active_apps.is_empty() {
                                 command_writer.send(
                                     content
-                                );
+                                ).expect("Expected command reader to be open.");
                             }
                         },
                         Action::AddScreen { screen_idx } => {

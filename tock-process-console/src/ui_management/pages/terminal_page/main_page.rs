@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
-use std::{collections::HashMap, fs::OpenOptions, io::Write};
+use std::collections::HashMap;
 
 use crossterm::event::{KeyCode, KeyEventKind, KeyModifiers};
 use ratatui::{
@@ -22,10 +22,13 @@ use super::{
     components::apps_list,
     section::usage::{widget_usage_to_text, UsageInfo, UsageInfoLine},
 };
-use itertools::Itertools;
 
 struct Properties {
+    // TODO(NegrilaRares): investigate if we need port
+    #[allow(dead_code)]
     active_apps: Vec<(usize, Option<String>)>,
+    // TODO(NegrilaRares): investigate if we need port
+    #[allow(dead_code)]
     app_data_map: HashMap<String, AppData>,
 }
 
@@ -40,6 +43,8 @@ impl From<&State> for Properties {
 
 pub struct MainPage {
     pub action_sender: UnboundedSender<Action>,
+    // TODO(NegrilaRares): investigate if we need port
+    #[allow(dead_code)]
     properties: Properties,
     pub hovered_screen: usize,
     pub active_screen: Option<usize>,
@@ -169,7 +174,7 @@ impl Component for MainPage {
 }
 
 impl ComponentRender<()> for MainPage {
-    fn render(&self, frame: &mut ratatui::prelude::Frame, _properties: ()) {
+    fn render(&mut self, frame: &mut ratatui::prelude::Frame, _properties: ()) {
         let [left, right] = *Layout::default()
             .direction(Direction::Horizontal)
             .constraints([Constraint::Percentage(80), Constraint::Percentage(20)].as_ref())
@@ -186,10 +191,7 @@ impl ComponentRender<()> for MainPage {
         let terminals = Layout::default()
             .direction(Direction::Horizontal)
             .constraints(constraints.as_slice())
-            .split(left)
-        else {
-            panic!("The left side cannot be split")
-        };
+            .split(left);
 
         for idx in 0..terminals.len() {
             let is_hovered_screen = if idx == self.hovered_screen {
