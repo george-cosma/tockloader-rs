@@ -20,11 +20,19 @@ pub fn make_cli() -> Command {
 
 /// Generate all of the [subcommands](clap::Command) used by the program.
 fn get_subcommands() -> Vec<Command> {
-    vec![Command::new("listen")
-        .about("Open a terminal to receive UART data")
-        .args(get_app_args())
-        .args(get_channel_args())
-        .arg_required_else_help(false)]
+    vec![
+        Command::new("listen")
+            .about("Open a terminal to receive UART data")
+            .args(get_app_args())
+            .args(get_channel_args())
+            .arg_required_else_help(false),
+        Command::new("list")
+            .about("List and inspect probes")
+            .args(get_app_args())
+            .args(get_channel_args())
+            .arg_required_else_help(false),
+        Command::new("install").about("Install apps"),
+    ]
 }
 
 /// Generate all of the [arguments](clap::Arg) that are required by subcommands which work with apps.
@@ -57,5 +65,9 @@ fn get_channel_args() -> Vec<clap::Arg> {
             .default_value("115200"),
         arg!(--"no-bootloader-entry" "Tell Tockloader to assume the bootloader is already active")
             .action(clap::ArgAction::SetTrue),
+        arg!(--chip <CHIP> "Explicitly specify the chip"),
+        arg!(--core <CORE> "Explicitly specify the core")
+            .value_parser(clap::value_parser!(usize))
+            .default_value("0"),
     ]
 }

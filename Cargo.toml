@@ -9,4 +9,5 @@ resolver= "2"
 members = [
     "tockloader",
     "tock-process-console", 
+    "tbf-parser",
 ]
