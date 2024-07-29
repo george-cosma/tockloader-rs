@@ -17,11 +17,18 @@ implemented to make TockLoader usable.
 
 ## Install Prerequisites
 
-### libudev
+### Linux
 
-#### Linux
+```bash
+sudo apt update
+sudo apt install libudev-dev
 ```
-sudo apt-get install -y  libudev-dev
+
+### WSL
+
+```bash
+sudo apt update
+sudo apt install libudev-dev pkg-config
 ```
 
 License
