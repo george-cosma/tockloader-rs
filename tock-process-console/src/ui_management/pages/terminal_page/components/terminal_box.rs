@@ -21,11 +21,7 @@ use tui_term::{vt100::Parser, widget::PseudoTerminal};
 use crate::{
     state_store::{Action, AppData, State},
     ui_management::{
-        components::ComponentRender,
-        pages::terminal_page::section::{
-            usage::{HasUsageInfo, UsageInfo, UsageInfoLine},
-            SectionActivation,
-        },
+        components::ComponentRender, pages::terminal_page::section::SectionActivation,
     },
 };
 
@@ -96,10 +92,6 @@ impl Component for TerminalBox {
             properties: Properties::from(state),
             ..self
         }
-    }
-
-    fn name(&self) -> &str {
-        "Terminal Box"
     }
 
     fn handle_key_event(&mut self, key: crossterm::event::KeyEvent) {
@@ -224,36 +216,6 @@ pub struct RenderProps {
     // TODO(NegrilaRares): investigate if we need port
     #[allow(dead_code)]
     pub show_cursor: bool,
-}
-
-impl HasUsageInfo for TerminalBox {
-    fn usage_info(&self) -> UsageInfo {
-        if self.properties.active_apps.get(self.screen_idx).is_none() {
-            UsageInfo {
-                description: Some(
-                    "You can not send a command until you pick an application.".into(),
-                ),
-                lines: vec![UsageInfoLine {
-                    keys: vec!["Esc".into()],
-                    description: "to cancel".into(),
-                }],
-            }
-        } else {
-            UsageInfo {
-                description: Some("Type your command to send it to the active application".into()),
-                lines: vec![
-                    UsageInfoLine {
-                        keys: vec!["Esc".into()],
-                        description: "to cancel".into(),
-                    },
-                    UsageInfoLine {
-                        keys: vec!["Enter".into()],
-                        description: "to send your message".into(),
-                    },
-                ],
-            }
-        }
-    }
 }
 
 impl ComponentRender<RenderProps> for TerminalBox {

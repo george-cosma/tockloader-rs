@@ -25,7 +25,7 @@ pub struct ConnectionHandler {
 }
 
 impl ConnectionHandler {
-    pub async fn new(
+    pub async fn connection_init(
         tty: &str,
     ) -> Result<(UnboundedReceiver<Event>, UnboundedSender<Bytes>), Error> {
         let mut port: SerialStream = tokio_serial::new(tty, 115200).open_native_async()?;
@@ -82,28 +82,25 @@ impl ConnectionHandler {
                         }
                     },
                     received_decoded_result = self.decoded_receiver.recv() => {
-                        match received_decoded_result {
-                            Some(board_message) => {
-                                let app_name = if board_message.is_app {
-                                    format!("app_{}", board_message.pid)
-                                } else if board_message.pid == 0 {
-                                    String::from("debug")
-                                } else {
-                                    String::from("kernel")
-                                };
+                        if let Some(board_message) = received_decoded_result {
+                            let app_name = if board_message.is_app {
+                                format!("app_{}", board_message.pid)
+                            } else if board_message.pid == 0 {
+                                String::from("debug")
+                            } else {
+                                String::from("kernel")
+                            };
 
-                                let _ = self.event_writer.send(
-                                    Event::NewMessage(
-                                        NewMessageEvent{
-                                            app: app_name,
-                                            pid: board_message.pid,
-                                            is_app: board_message.is_app,
-                                            payload: board_message.payload
-                                        }
-                                    )
-                                );
-                            },
-                            None => {}
+                            let _ = self.event_writer.send(
+                                Event::NewMessage(
+                                    NewMessageEvent{
+                                        app: app_name,
+                                        pid: board_message.pid,
+                                        is_app: board_message.is_app,
+                                        payload: board_message.payload
+                                    }
+                                )
+                            );
                         }
                     }
                 }

@@ -19,7 +19,6 @@ pub struct AppData {
     pub name: String,
     // Process ID of the application running on the board
     pub pid: u64,
-    ///
     pub is_app: bool,
     // TODO: de vazut daca trebuie sa avem altceva in loc de string, sau daca nu avem de fapt nevoie sa fie o lista circulara
     pub logs: CircularQueue<Vec<u8>>,

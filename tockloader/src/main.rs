@@ -12,15 +12,11 @@ use clap::ArgMatches;
 use cli::make_cli;
 use errors::TockloaderError;
 
-use glob::glob;
 use inquire::Select;
-use interfaces::{build_interface, traits::*};
 use probe_rs::probe::list::Lister;
 use probe_rs::{MemoryInterface, Permissions};
 use tbf_parser::parse::*;
 use tbf_parser::types::*;
-use tock_process_console;
-use tokio::time::sleep;
 
 #[tokio::main]
 async fn main() -> Result<(), TockloaderError> {
@@ -40,7 +36,7 @@ async fn run() -> Result<(), TockloaderError> {
 
     match matches.subcommand() {
         Some(("listen", _sub_matches)) => {
-            let _ = match tock_process_console::run().await {
+            match tock_process_console::run().await {
                 Ok(()) => {}
                 Err(_) => {
                     print!("cli bricked!")
@@ -50,7 +46,7 @@ async fn run() -> Result<(), TockloaderError> {
         Some(("list", sub_matches)) => {
             list_probes(sub_matches).await?;
         }
-        Some(("install", sub_matches)) => {}
+        Some(("install", _sub_matches)) => {}
         // If only the "--debug" flag is set, then this branch is executed
         // Or, more likely at this stage, a subcommand hasn't been implemented yet.
         _ => {

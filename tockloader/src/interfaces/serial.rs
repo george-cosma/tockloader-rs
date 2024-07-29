@@ -33,8 +33,8 @@ impl SerialInterface {
             } else {
                 // available_ports.len() > 1
                 // todo!("Make user choose out of multiple available ports")
-                for n in 0..available_ports.len() {
-                    println!("port [{}]: {:?},\n", n, available_ports[n]);
+                for (n, info) in available_ports.iter().enumerate() {
+                    println!("port [{}]: {:?},\n", n, info);
                 }
 
                 clean_port_path(available_ports[15].port_name.clone())

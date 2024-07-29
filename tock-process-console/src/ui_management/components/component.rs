@@ -20,8 +20,6 @@ pub trait Component {
     where
         Self: Sized;
 
-    fn name(&self) -> &str;
-
     fn handle_key_event(&mut self, key: KeyEvent);
 
     fn handle_mouse_event(&mut self, event: MouseEvent);

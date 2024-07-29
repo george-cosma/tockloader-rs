@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
-use super::super::section::usage::{HasUsageInfo, UsageInfo, UsageInfoLine};
 use crate::{
     state_store::{Action, State},
     ui_management::{
@@ -130,10 +129,6 @@ impl Component for AppsList {
         }
     }
 
-    fn name(&self) -> &str {
-        "Apps List"
-    }
-
     fn handle_key_event(&mut self, key: crossterm::event::KeyEvent) {
         if key.kind != KeyEventKind::Press {
             return;
@@ -237,7 +232,7 @@ impl SectionActivation for AppsList {
         let idx = self
             .active_app
             .as_ref()
-            .and_then(|app_name| self.get_room_index(&app_name))
+            .and_then(|app_name| self.get_room_index(app_name))
             .unwrap_or(0);
 
         *self.list_state.offset_mut() = 0;
@@ -247,27 +242,5 @@ impl SectionActivation for AppsList {
     fn deactivate(&mut self) {
         *self.list_state.offset_mut() = 0;
         self.list_state.select(None);
-    }
-}
-
-impl HasUsageInfo for AppsList {
-    fn usage_info(&self) -> UsageInfo {
-        UsageInfo {
-            description: Some("Select the running process to interact with".into()),
-            lines: vec![
-                UsageInfoLine {
-                    keys: vec!["Esc".into()],
-                    description: "to cancel.".into(),
-                },
-                UsageInfoLine {
-                    keys: vec!["↑".into(), "↓".into()],
-                    description: "to navigate".into(),
-                },
-                UsageInfoLine {
-                    keys: vec!["Enter".into()],
-                    description: "to select application.".into(),
-                },
-            ],
-        }
     }
 }

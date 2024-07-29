@@ -482,7 +482,7 @@ impl<const L: usize> core::convert::TryFrom<&[u8]> for TbfHeaderV2PackageName<L>
 
         Ok(TbfHeaderV2PackageName {
             size: value.len() as u32,
-            buffer: buffer,
+            buffer,
         })
     }
 }

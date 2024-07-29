@@ -7,12 +7,9 @@ use super::{
         apps_list::{self, AppsList},
         terminal_box::{RenderProps, TerminalBox},
     },
-    section::{
-        self,
-        usage::{HasUsageInfo, UsageInfo, UsageInfoLine},
-        SectionActivation,
-    },
+    section::SectionActivation,
 };
+
 use crate::{
     state_store::{Action, AppData, State},
     ui_management::components::{Component, ComponentRender},
@@ -27,8 +24,9 @@ use ratatui::{
 use std::collections::HashMap;
 use tokio::sync::mpsc::UnboundedSender;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub enum Section {
+    #[default]
     AppsList,
     Terminal,
 }
@@ -53,12 +51,6 @@ impl TryFrom<usize> for Section {
             1 => Ok(Section::Terminal),
             _ => Err(()),
         }
-    }
-}
-
-impl Default for Section {
-    fn default() -> Self {
-        Section::AppsList
     }
 }
 
@@ -101,13 +93,6 @@ pub struct ApplicationsPage {
 impl ApplicationsPage {
     fn get_app_data(&self, name: &str) -> Option<&AppData> {
         self.properties.app_data_map.get(name)
-    }
-
-    fn get_component_for_section(&self, section: &Section) -> &dyn Component {
-        match section {
-            Section::AppsList => &self.app_list,
-            Section::Terminal => &self.terminal,
-        }
     }
 
     fn get_component_for_section_mut<'a>(&'a mut self, section: &Section) -> &'a mut dyn Component {
@@ -204,10 +189,6 @@ impl Component for ApplicationsPage {
         }
     }
 
-    fn name(&self) -> &str {
-        "Applications Page"
-    }
-
     fn handle_key_event(&mut self, key: crossterm::event::KeyEvent) {
         if key.kind != KeyEventKind::Press {
             return;
@@ -288,7 +269,7 @@ impl ComponentRender<apps_list::RenderProperties> for ApplicationsPage {
             .and_then(|active_app| active_app.clone())
             .and_then(|active_app| self.get_app_data(active_app.as_ref()))
         {
-            let mut app_info = vec![Span::from(format!("{}", app_data.name))];
+            let mut app_info = vec![Span::from(app_data.name.to_string())];
 
             if app_data.is_app {
                 app_info.append(&mut vec![
@@ -343,40 +324,5 @@ impl ComponentRender<apps_list::RenderProperties> for ApplicationsPage {
         //     .wrap(Wrap { trim: true })
         //     .block(Block::default().borders(Borders::ALL).title("Usage"));
         // frame.render_widget(usage, right);
-    }
-}
-
-impl HasUsageInfo for ApplicationsPage {
-    fn usage_info(&self) -> section::usage::UsageInfo {
-        if let Some(section) = self.active_section.as_ref() {
-            let handler: &dyn HasUsageInfo = match section {
-                Section::AppsList => &self.app_list,
-                Section::Terminal => &self.terminal,
-            };
-
-            handler.usage_info()
-        } else {
-            UsageInfo {
-                description: Some("Select a widget".into()),
-                lines: vec![
-                    UsageInfoLine {
-                        keys: vec!["q".into()],
-                        description: "to exit".into(),
-                    },
-                    UsageInfoLine {
-                        keys: vec!["←".into(), "→".into()],
-                        description: "to hover widgets".into(),
-                    },
-                    UsageInfoLine {
-                        keys: vec!["e".into()],
-                        description: format!(
-                            "to activate {}",
-                            self.get_component_for_section(&self.currently_hovered_section)
-                                .name()
-                        ),
-                    },
-                ],
-            }
-        }
     }
 }

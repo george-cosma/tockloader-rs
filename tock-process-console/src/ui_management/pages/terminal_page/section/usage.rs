@@ -17,10 +17,6 @@ pub struct UsageInfo {
     pub lines: Vec<UsageInfoLine>,
 }
 
-pub trait HasUsageInfo {
-    fn usage_info(&self) -> UsageInfo;
-}
-
 fn key_to_span<'a>(key: &String) -> Span<'a> {
     Span::from(format!("( {} )", key)).bold()
 }

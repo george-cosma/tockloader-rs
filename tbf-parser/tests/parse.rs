@@ -16,7 +16,7 @@ fn simple_tbf() {
 
     let header = parse_tbf_header(&buffer[0..header_len as usize], 2).unwrap();
     dbg!(&header);
-    assert_eq!(header.enabled(), true);
+    assert!(header.enabled());
     assert_eq!(header.get_minimum_app_ram_size(), 4848);
     assert_eq!(header.get_init_function_offset(), 41 + header_len as u32);
     assert_eq!(header.get_protected_size(), header_len as u32);
@@ -37,7 +37,7 @@ fn footer_sha256() {
 
     let header = parse_tbf_header(&buffer[0..header_len as usize], 2).unwrap();
     dbg!(&header);
-    assert_eq!(header.enabled(), true);
+    assert!(header.enabled());
     assert_eq!(header.get_minimum_app_ram_size(), 4848);
     assert_eq!(header.get_init_function_offset(), 41 + header_len as u32);
     assert_eq!(header.get_protected_size(), header_len as u32);
@@ -87,7 +87,7 @@ fn footer_rsa4096() {
 
     let header = parse_tbf_header(&buffer[0..header_len as usize], 2).unwrap();
     dbg!(&header);
-    assert_eq!(header.enabled(), true);
+    assert!(header.enabled());
     assert_eq!(header.get_minimum_app_ram_size(), 4612);
     assert_eq!(header.get_init_function_offset(), 41 + header_len as u32);
     assert_eq!(header.get_protected_size(), header_len as u32);

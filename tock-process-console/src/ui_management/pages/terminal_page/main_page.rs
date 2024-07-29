@@ -103,11 +103,10 @@ impl Component for MainPage {
 
         let action_sender = self.screens.last().unwrap().action_sender.clone();
         for (new_screen_idx, _) in state.active_apps.clone() {
-            if self
+            if !self
                 .screens
                 .iter()
-                .find(|app| app.screen_idx == new_screen_idx)
-                .is_none()
+                .any(|app| app.screen_idx == new_screen_idx)
             {
                 updated_screens.push(ApplicationsPage::new(
                     state,
@@ -124,16 +123,12 @@ impl Component for MainPage {
         }
     }
 
-    fn name(&self) -> &str {
-        "Main Page"
-    }
-
     fn handle_key_event(&mut self, key: crossterm::event::KeyEvent) {
         if key.kind != KeyEventKind::Press {
             return;
         }
 
-        let active_screen = self.active_screen.clone();
+        let active_screen = self.active_screen;
 
         match active_screen {
             None => match key.code {
@@ -194,16 +189,8 @@ impl ComponentRender<()> for MainPage {
             .split(left);
 
         for idx in 0..terminals.len() {
-            let is_hovered_screen = if idx == self.hovered_screen {
-                true
-            } else {
-                false
-            };
-            let is_active_screen = if idx == self.active_screen.unwrap_or(usize::MAX) {
-                true
-            } else {
-                false
-            };
+            let is_hovered_screen = idx == self.hovered_screen;
+            let is_active_screen = idx == self.active_screen.unwrap_or(usize::MAX);
 
             self.screens[idx].render(
                 frame,

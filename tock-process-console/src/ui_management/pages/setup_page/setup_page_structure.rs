@@ -112,10 +112,6 @@ impl Component for SetupPage {
         .update_with_state(state)
     }
 
-    fn name(&self) -> &str {
-        "Setup page"
-    }
-
     fn handle_key_event(&mut self, key: crossterm::event::KeyEvent) {
         if key.kind != KeyEventKind::Press {
             return;

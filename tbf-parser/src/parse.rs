@@ -302,7 +302,7 @@ pub fn parse_tbf_header(
                     fixed_addresses: fixed_address_pointer,
                     permissions: permissions_pointer,
                     storage_permissions: storage_permissions_pointer,
-                    kernel_version: kernel_version,
+                    kernel_version,
                 };
 
                 Ok(types::TbfHeader::TbfHeaderV2(tbf_header))

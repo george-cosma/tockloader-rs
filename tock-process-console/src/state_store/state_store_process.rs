@@ -125,7 +125,7 @@ impl StateStore {
 }
 
 async fn connect_to_board(tty: &str) -> anyhow::Result<ConnectionHandle> {
-    match ConnectionHandler::new(tty).await {
+    match ConnectionHandler::connection_init(tty).await {
         Ok((event_reader, command_writer)) => Ok((event_reader, command_writer)),
         Err(err) => Err(err),
     }

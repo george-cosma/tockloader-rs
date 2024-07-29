@@ -1,7 +1,6 @@
 // Licensed under the Apache License, Version 2.0 or the MIT License.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
-
 use self::{setup_page::SetupPage, terminal_page::main_page::MainPage};
 use super::components::{Component, ComponentRender};
 use crate::state_store::{Action, BoardConnectionStatus, State};
@@ -31,13 +30,6 @@ pub struct AppRouter {
 }
 
 impl AppRouter {
-    fn get_active_page_component(&self) -> &dyn Component {
-        match self.active_page {
-            ActivePage::SetupPage => &self.setup_page,
-            ActivePage::MainPage => &self.main_page,
-        }
-    }
-
     fn get_active_page_component_mut(&mut self) -> &mut dyn Component {
         match self.active_page {
             ActivePage::SetupPage => &mut self.setup_page,
@@ -60,10 +52,6 @@ impl Component for AppRouter {
             setup_page: SetupPage::new(state, None, action_sender.clone()),
             main_page: MainPage::new(state, None, action_sender.clone()),
         }
-    }
-
-    fn name(&self) -> &str {
-        self.get_active_page_component().name()
     }
 
     fn handle_key_event(&mut self, key: crossterm::event::KeyEvent) {

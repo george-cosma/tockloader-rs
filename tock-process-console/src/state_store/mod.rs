@@ -10,5 +10,5 @@ pub use state::AppData;
 pub use state::BoardConnectionStatus;
 pub use state::State;
 
-pub mod state_store;
-pub use self::state_store::StateStore;
+pub mod state_store_process;
+pub use self::state_store_process::StateStore;
