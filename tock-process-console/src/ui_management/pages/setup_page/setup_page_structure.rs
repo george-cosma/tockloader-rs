@@ -195,7 +195,7 @@ impl ComponentRender<()> for SetupPage {
                 Constraint::Percentage(35),
             ]);
 
-        let [_, serial_position_v, _] = temp_serial_position_v.areas(frame.size());
+        let [_, serial_position_v, _] = temp_serial_position_v.areas(frame.area());
 
         let temp_serial_position_h = Layout::default()
             .direction(Direction::Horizontal)
@@ -293,7 +293,7 @@ impl ComponentRender<()> for SetupPage {
                 Constraint::Percentage(10),
             ]);
 
-        let [_, help_text_v, _] = temp_help_text_v.areas(frame.size());
+        let [_, help_text_v, _] = temp_help_text_v.areas(frame.area());
 
         let temp_help_text_h = Layout::default()
             .direction(Direction::Horizontal)
@@ -313,7 +313,7 @@ impl ComponentRender<()> for SetupPage {
                 Constraint::Percentage(10),
             ]);
 
-        let [_, panic_v, _] = temp_panic_v.areas(frame.size());
+        let [_, panic_v, _] = temp_panic_v.areas(frame.area());
 
         let temp_panic_h = Layout::default()
             .direction(Direction::Horizontal)
@@ -333,7 +333,7 @@ impl ComponentRender<()> for SetupPage {
                 Constraint::Percentage(10),
             ]);
 
-        let [_, show_text_v, _] = temp_show_text_v.areas(frame.size());
+        let [_, show_text_v, _] = temp_show_text_v.areas(frame.area());
 
         let temp_show_text_h = Layout::default()
             .direction(Direction::Horizontal)
@@ -356,7 +356,7 @@ impl ComponentRender<()> for SetupPage {
                 Constraint::Percentage(10),
             ]);
 
-        let [_, enter_text_v, _] = temp_enter_text_v.areas(frame.size());
+        let [_, enter_text_v, _] = temp_enter_text_v.areas(frame.area());
 
         let temp_enter_text_h = Layout::default()
             .direction(Direction::Horizontal)

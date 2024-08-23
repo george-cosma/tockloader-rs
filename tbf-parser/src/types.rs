@@ -829,6 +829,42 @@ impl TbfHeader {
         }
     }
 
+    /// Return whether the application is sticky or not.
+    /// Sticky applications require additional confirmation to be erased.
+    pub fn sticky(&self) -> bool {
+        match *self {
+            TbfHeader::TbfHeaderV2(hd) => {
+                // Bit 2 of flags is the sticky bit.
+                hd.base.flags & 0x00000002 != 0
+            }
+            TbfHeader::Padding(_) => false,
+        }
+    }
+
+    /// Return total size of the application.
+    pub fn total_size(&self) -> u32 {
+        match *self {
+            TbfHeader::TbfHeaderV2(hd) => hd.base.total_size,
+            TbfHeader::Padding(_) => 0,
+        }
+    }
+
+    /// Return checksum of the application.
+    pub fn checksum(&self) -> u32 {
+        match *self {
+            TbfHeader::TbfHeaderV2(hd) => hd.base.checksum,
+            TbfHeader::Padding(_) => 0,
+        }
+    }
+
+    /// Return header size of the application.
+    pub fn header_size(&self) -> u16 {
+        match *self {
+            TbfHeader::TbfHeaderV2(hd) => hd.base.header_size,
+            TbfHeader::Padding(_) => 0,
+        }
+    }
+
     /// Add up all of the relevant fields in header version 1, or just used the
     /// app provided value in version 2 to get the total amount of RAM that is
     /// needed for this app.

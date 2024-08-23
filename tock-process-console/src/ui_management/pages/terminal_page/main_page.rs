@@ -173,7 +173,7 @@ impl ComponentRender<()> for MainPage {
         let [left, right] = *Layout::default()
             .direction(Direction::Horizontal)
             .constraints([Constraint::Percentage(80), Constraint::Percentage(20)].as_ref())
-            .split(frame.size())
+            .split(frame.area())
         else {
             panic!("The main layout should have 3 chunks")
         };

@@ -13,7 +13,8 @@ use crossterm::event::{KeyCode, KeyEventKind, MouseEventKind};
 use ratatui::{
     layout::{Alignment, Rect},
     style::{Color, Modifier, Style},
-    widgets::{Block, Borders, Paragraph},
+    widgets::block::Block,
+    widgets::{Borders, Paragraph},
 };
 use tokio::sync::mpsc::UnboundedSender;
 use tui_term::{vt100::Parser, widget::PseudoTerminal};
@@ -232,11 +233,6 @@ impl ComponentRender<RenderProps> for TerminalBox {
             )
             .split(properties.area);
 
-        let block: ratatui::widgets::Block<'_> = Block::default()
-            .borders(Borders::ALL)
-            .border_style(Style::new().fg(properties.border_color))
-            .style(Style::default().add_modifier(Modifier::BOLD));
-
         if let Some(Some(active_app)) = self
             .properties
             .active_apps
@@ -252,7 +248,12 @@ impl ComponentRender<RenderProps> for TerminalBox {
                     properties.area.columns().count() as u16,
                 );
 
-                let pseudo_terminal = PseudoTerminal::new(parser.screen()).block(block);
+                let pseudo_terminal = PseudoTerminal::new(parser.screen()).block(
+                    Block::default()
+                        .borders(Borders::ALL)
+                        .border_style(Style::new().fg(properties.border_color))
+                        .style(Style::default().add_modifier(Modifier::BOLD)),
+                );
                 frame.render_widget(pseudo_terminal, chunks[0]);
             }
         };

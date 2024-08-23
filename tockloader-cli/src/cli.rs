@@ -30,8 +30,12 @@ fn get_subcommands() -> Vec<Command> {
             .about("List and inspect probes")
             .args(get_app_args())
             .args(get_channel_args())
-            .arg_required_else_help(false),
-        Command::new("install").about("Install apps"),
+            .arg_required_else_help(true),
+        Command::new("info")
+            .about("Verbose information about the connected board")
+            .args(get_app_args())
+            .args(get_channel_args())
+            .arg_required_else_help(true),
     ]
 }
 
@@ -69,5 +73,6 @@ fn get_channel_args() -> Vec<clap::Arg> {
         arg!(--core <CORE> "Explicitly specify the core")
             .value_parser(clap::value_parser!(usize))
             .default_value("0"),
+        arg!(--tab <TAB> "Specify the path of the tab file"),
     ]
 }
