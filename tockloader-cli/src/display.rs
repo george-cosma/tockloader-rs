@@ -7,7 +7,7 @@ use tockloader_lib::attributes::{
 };
 
 pub async fn print_list(app_details: &mut [AppAttributes]) {
-    for (i, temp_data) in app_details.iter().enumerate() {
+    for (i, details) in app_details.iter().enumerate() {
         println!("\n\x1b[0m\x1b[1;35m ┏━━━━━━━━━━━━━━━━┓");
         println!(
             "\x1b[0m\x1b[1;31m ┃ \x1b[0m\x1b[1;32m App_{:<9?} \x1b[0m\x1b[1;31m┃",
@@ -16,33 +16,33 @@ pub async fn print_list(app_details: &mut [AppAttributes]) {
         println!("\x1b[0m\x1b[1;33m ┗━━━━━━━━━━━━━━━━┛");
         println!(
             "\n \x1b[1;32m Name:                {}",
-            temp_data.tbf_header.get_package_name().unwrap()
+            details.tbf_header.get_package_name().unwrap()
         );
 
         println!(
             " \x1b[1;32m Version:             {}",
-            temp_data.tbf_header.get_binary_version()
+            details.tbf_header.get_binary_version()
         );
 
         println!(
             " \x1b[1;32m Enabled:             {}",
-            temp_data.tbf_header.enabled()
+            details.tbf_header.enabled()
         );
 
         println!(
             " \x1b[1;32m Sticky:              {}",
-            temp_data.tbf_header.sticky()
+            details.tbf_header.sticky()
         );
 
         println!(
             " \x1b[1;32m Total_Size:          {}\n\n",
-            temp_data.tbf_header.total_size()
+            details.tbf_header.total_size()
         );
     }
 }
 
 pub async fn print_info(app_details: &mut [AppAttributes], system_details: &mut SystemAttributes) {
-    for (i, temp_data) in app_details.iter().enumerate() {
+    for (i, details) in app_details.iter().enumerate() {
         println!("\n\x1b[0m\x1b[1;35m ┏━━━━━━━━━━━━━━━━┓");
         println!(
             "\x1b[0m\x1b[1;31m ┃ \x1b[0m\x1b[1;32m App_{:<9?} \x1b[0m\x1b[1;31m┃",
@@ -51,150 +51,158 @@ pub async fn print_info(app_details: &mut [AppAttributes], system_details: &mut 
         println!("\x1b[0m\x1b[1;33m ┗━━━━━━━━━━━━━━━━┛");
         println!(
             "\n \x1b[1;32m Name:                {}",
-            temp_data.tbf_header.get_package_name().unwrap()
+            details.tbf_header.get_package_name().unwrap()
         );
 
         println!(
             " \x1b[1;32m Version:             {}",
-            temp_data.tbf_header.get_binary_version()
+            details.tbf_header.get_binary_version()
         );
 
         println!(
             " \x1b[1;32m Enabled:             {}",
-            temp_data.tbf_header.enabled()
+            details.tbf_header.enabled()
         );
 
         println!(
             " \x1b[1;32m Stricky:             {}",
-            temp_data.tbf_header.sticky()
+            details.tbf_header.sticky()
         );
 
         println!(
             " \x1b[1;32m Total_Size:          {}",
-            temp_data.tbf_header.total_size()
+            details.tbf_header.total_size()
         );
 
         println!(
-            " \x1b[1;32m Address in Flash:  {:<10}",
+            " \x1b[1;32m Address in Flash:  {}",
             system_details.appaddr.unwrap()
         );
 
         println!(
-            " \x1b[1;32m    TBF version:    {:<10}",
-            temp_data.tbf_header.get_binary_version()
+            " \x1b[1;32m    TBF version:    {}",
+            details.tbf_header.get_binary_version()
         );
 
         println!(
-            " \x1b[1;32m    header_size:    {:<10}",
-            temp_data.tbf_header.header_size()
+            " \x1b[1;32m    header_size:    {}",
+            details.tbf_header.header_size()
         );
 
         println!(
-            " \x1b[1;32m    total_size:     {:<10}",
-            temp_data.tbf_header.total_size()
+            " \x1b[1;32m    total_size:     {}",
+            details.tbf_header.total_size()
         );
 
         println!(
-            " \x1b[1;32m    checksum:       {:<10}",
-            temp_data.tbf_header.checksum()
+            " \x1b[1;32m    checksum:       {}",
+            details.tbf_header.checksum()
         );
 
         println!(" \x1b[1;32m    flags:");
         println!(
-            " \x1b[1;32m        enabled:        {:<10}",
-            temp_data.tbf_header.enabled()
+            " \x1b[1;32m        enabled:        {}",
+            details.tbf_header.enabled()
         );
 
         println!(
-            " \x1b[1;32m        sticky:         {:<10}",
-            temp_data.tbf_header.sticky()
+            " \x1b[1;32m        sticky:         {}",
+            details.tbf_header.sticky()
         );
 
         println!(" \x1b[1;32m    TVL: Main (1)",);
 
         println!(
-            " \x1b[1;32m        init_fn_offset:             {:<10}",
-            temp_data.tbf_header.get_init_function_offset()
+            " \x1b[1;32m        init_fn_offset:             {}",
+            details.tbf_header.get_init_function_offset()
         );
 
         println!(
-            " \x1b[1;32m        protected_size:             {:<10}",
-            temp_data.tbf_header.get_protected_size()
+            " \x1b[1;32m        protected_size:             {}",
+            details.tbf_header.get_protected_size()
         );
 
         println!(
-            " \x1b[1;32m        minimum_ram_size:           {:<10}",
-            temp_data.tbf_header.get_minimum_app_ram_size()
+            " \x1b[1;32m        minimum_ram_size:           {}",
+            details.tbf_header.get_minimum_app_ram_size()
         );
 
         println!(" \x1b[1;32m    TVL: Program (9)",);
 
         println!(
-            " \x1b[1;32m        init_fn_offset:             {:<10}",
-            temp_data.tbf_header.get_init_function_offset()
+            " \x1b[1;32m        init_fn_offset:             {}",
+            details.tbf_header.get_init_function_offset()
         );
 
         println!(
-            " \x1b[1;32m        protected_size:             {:<10}",
-            temp_data.tbf_header.get_protected_size()
+            " \x1b[1;32m        protected_size:             {}",
+            details.tbf_header.get_protected_size()
         );
 
         println!(
-            " \x1b[1;32m        minimum_ram_size:           {:<10}",
-            temp_data.tbf_header.get_minimum_app_ram_size()
+            " \x1b[1;32m        minimum_ram_size:           {}",
+            details.tbf_header.get_minimum_app_ram_size()
         );
 
         println!(
-            " \x1b[1;32m        binary_end_offset:          {:<10}",
-            temp_data.tbf_header.get_binary_end()
+            " \x1b[1;32m        binary_end_offset:          {}",
+            details.tbf_header.get_binary_end()
         );
 
         println!(
-            " \x1b[1;32m        app_version:                {:<10}",
-            temp_data.tbf_header.get_binary_version()
+            " \x1b[1;32m        app_version:                {}",
+            details.tbf_header.get_binary_version()
         );
 
         println!(" \x1b[1;32m    TVL: Package Name (3)",);
 
         println!(
-            " \x1b[1;32m        package_name:               {:<10}",
-            temp_data.tbf_header.get_package_name().unwrap()
+            " \x1b[1;32m        package_name:               {}",
+            details.tbf_header.get_package_name().unwrap()
         );
 
         println!(" \x1b[1;32m    TVL: Kernel Version (8)",);
 
         println!(
-            " \x1b[1;32m        kernel_major:               {:<10}",
-            temp_data.tbf_header.get_kernel_version().unwrap().0,
+            " \x1b[1;32m        kernel_major:               {}",
+            details.tbf_header.get_kernel_version().unwrap().0
         );
 
         println!(
-            " \x1b[1;32m        kernel_minor:               {:<10}",
-            temp_data.tbf_header.get_kernel_version().unwrap().1,
+            " \x1b[1;32m        kernel_minor:               {}",
+            details.tbf_header.get_kernel_version().unwrap().1,
         );
+
+        println!("\n \x1b[1;32m    Footer");
+
+        let mut total_footer_size: u32 = 0;
+
+        //  Usage of +4 is a result of the structure of the Tock Binary Format (https://book.tockos.org/doc/tock_binary_format)
+        //  Because we need the real size of the footer including the type and length.
+        for footer_details in details.tbf_footers.iter() {
+            total_footer_size += footer_details.size + 4;
+        }
 
         println!(
-            " \x1b[1;32m        kernel version:             {}.{}",
-            temp_data.tbf_header.get_kernel_version().unwrap().0,
-            temp_data.tbf_header.get_kernel_version().unwrap().1
+            " \x1b[1;32m            footer_size:            {}",
+            total_footer_size
         );
 
-        //TODO(NegrilaRares): Remake the whole footer part
-        //take multiple into consideration
+        for (i, footer_details) in details.tbf_footers.iter().enumerate() {
+            println!(" \x1b[1;32m    Footer [{i}] TVL: Credentials");
 
-        // println!("\n \x1b[1;32m    Footer");
-        //
-        // println!(
-        //     " \x1b[1;32m        footer_size:            {:<10}",
-        //     temp_data.footer_size.unwrap()
-        // );
-        //
-        // println!(" \x1b[1;32m    Footer TVL: Credentials");
-        //
-        // println!(
-        //     " \x1b[1;32m        Length:                 {:<10}\n\n",
-        //     temp_data.footer_size.unwrap() - 8
-        // );
+            println!(
+                " \x1b[1;32m        Type:                       {}",
+                footer_details.credentials.get_type()
+            );
+
+            //  Usage of -4 is a result of the structure of the Tock Binary Format (https://book.tockos.org/doc/tock_binary_format)
+            //  Because we only need the size of the credentials without the type and length bytes.
+            println!(
+                " \x1b[1;32m        Length:                     {}",
+                footer_details.size - 4
+            );
+        }
     }
 
     println!("\n\n\x1b[1;32m Kernel Attributes");

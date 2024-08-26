@@ -753,6 +753,19 @@ impl core::convert::TryFrom<&[u8]> for TbfFooterV2Credentials {
     }
 }
 
+impl TbfFooterV2Credentials {
+    pub fn get_type(&self) -> &str {
+        match self {
+            TbfFooterV2Credentials::Reserved(_) => "Reserved",
+            TbfFooterV2Credentials::Rsa3072Key(_) => "Rsa3072Key",
+            TbfFooterV2Credentials::Rsa4096Key(_) => "Rsa4096Key",
+            TbfFooterV2Credentials::SHA256(_) => "SHA256",
+            TbfFooterV2Credentials::SHA384(_) => "SHA384",
+            TbfFooterV2Credentials::SHA512(_) => "SHA512",
+        }
+    }
+}
+
 /// The command permissions specified by the TBF header.
 ///
 /// Use the `get_command_permissions()` function to retrieve these.
