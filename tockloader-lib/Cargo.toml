@@ -14,5 +14,7 @@ probe-rs = "0.24.0"
 tbf-parser = { path = "../tbf-parser"}
 utf8-decode = "1.0.1"
 byteorder = "1.5.0"
-
-
+tar = "0.4.41"
+bytes = "1.7.1"
+toml = "0.8.19"
+serde = { version = "1.0.210", features = ["derive"] }
