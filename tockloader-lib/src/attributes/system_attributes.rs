@@ -4,6 +4,9 @@
 
 use byteorder::{ByteOrder, LittleEndian};
 use probe_rs::{Core, MemoryInterface};
+use tokio_serial::SerialStream;
+
+use crate::bootloader_serial::{issue_command, Command, Response};
 
 use super::decode::{bytes_to_string, decode_attribute};
 
@@ -40,7 +43,7 @@ impl SystemAttributes {
     }
 
     // TODO: explain what is happening here
-    pub(crate) fn read_system_attributes(board_core: &mut Core) -> Self {
+    pub(crate) fn read_system_attributes_probe(board_core: &mut Core) -> Self {
         let mut result = SystemAttributes::new();
         let address = 0x600;
         let mut buf = [0u8; 64 * 16];
@@ -110,6 +113,128 @@ impl SystemAttributes {
         board_core
             .read(result.appaddr.unwrap() - 100, &mut kernel_attr_binary)
             .unwrap();
+
+        let sentinel = bytes_to_string(&kernel_attr_binary[96..100]);
+        let kernel_version = LittleEndian::read_uint(&kernel_attr_binary[95..96], 1);
+
+        let app_memory_len = LittleEndian::read_u32(&kernel_attr_binary[84..92]);
+        let app_memory_start = LittleEndian::read_u32(&kernel_attr_binary[80..84]);
+
+        let kernel_binary_start = LittleEndian::read_u32(&kernel_attr_binary[68..72]);
+        let kernel_binary_len = LittleEndian::read_u32(&kernel_attr_binary[72..76]);
+
+        result.sentinel = Some(sentinel);
+        result.kernel_version = Some(kernel_version);
+        result.app_mem_start = Some(app_memory_start);
+        result.app_mem_len = Some(app_memory_len);
+        result.kernel_bin_start = Some(kernel_binary_start);
+        result.kernel_bin_len = Some(kernel_binary_len);
+
+        result
+    }
+
+    // TODO: explain what is happening here
+    pub(crate) async fn read_system_attributes_serial(port: &mut SerialStream) -> Self {
+        let mut result = SystemAttributes::new();
+
+        let mut pkt = (0x600_u32).to_le_bytes().to_vec();
+        let length = (1024_u16).to_le_bytes().to_vec();
+        for i in length {
+            pkt.push(i);
+        }
+
+        let (_, buf) = issue_command(
+            port,
+            Command::ReadRange,
+            pkt,
+            true,
+            64 * 16,
+            Response::ReadRange,
+        )
+        .await
+        .unwrap();
+
+        let mut data = buf.chunks(64);
+
+        for index_data in 0..data.len() {
+            let step = match data.next() {
+                Some(data) => data,
+                None => break,
+            };
+
+            let step_option = decode_attribute(step);
+
+            if step_option.is_none() {
+                continue;
+            }
+
+            let decoded_attributes = step_option.unwrap();
+
+            match index_data {
+                0 => {
+                    result.board = Some(decoded_attributes.value.to_string());
+                }
+                1 => {
+                    result.arch = Some(decoded_attributes.value.to_string());
+                }
+                2 => {
+                    result.appaddr = Some(
+                        u64::from_str_radix(
+                            decoded_attributes
+                                .value
+                                .to_string()
+                                .trim_start_matches("0x"),
+                            16,
+                        )
+                        .unwrap(),
+                    );
+                }
+                3 => {
+                    result.boothash = Some(decoded_attributes.value.to_string());
+                }
+                _ => panic!("Board data not found!"),
+            }
+        }
+
+        let mut pkt = (0x40E_u32).to_le_bytes().to_vec();
+        let length = (8_u16).to_le_bytes().to_vec();
+        for i in length {
+            pkt.push(i);
+        }
+
+        let (_, buf) = issue_command(port, Command::ReadRange, pkt, true, 8, Response::ReadRange)
+            .await
+            .unwrap();
+
+        let decoder = utf8_decode::Decoder::new(buf.iter().cloned());
+
+        let mut string = String::new();
+        for n in decoder {
+            string.push(n.expect("Error decoding bootloader version"));
+        }
+
+        let string = string.trim_matches(char::from(0));
+
+        result.bootloader_version = Some(string.to_owned());
+
+        let mut pkt = ((result.appaddr.unwrap() - 100) as u32)
+            .to_le_bytes()
+            .to_vec();
+        let length = (100_u16).to_le_bytes().to_vec();
+        for i in length {
+            pkt.push(i);
+        }
+
+        let (_, kernel_attr_binary) = issue_command(
+            port,
+            Command::ReadRange,
+            pkt,
+            true,
+            100,
+            Response::ReadRange,
+        )
+        .await
+        .unwrap();
 
         let sentinel = bytes_to_string(&kernel_attr_binary[96..100]);
         let kernel_version = LittleEndian::read_uint(&kernel_attr_binary[95..96], 1);
