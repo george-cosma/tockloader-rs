@@ -18,3 +18,4 @@ tar = "0.4.41"
 bytes = "1.7.1"
 toml = "0.8.19"
 serde = { version = "1.0.210", features = ["derive"] }
+thiserror = "1.0.63"

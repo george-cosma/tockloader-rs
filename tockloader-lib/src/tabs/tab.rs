@@ -21,22 +21,25 @@ impl Tab {
     pub fn open(path: String) -> Result<Self, TockloaderError> {
         let mut metadata = None;
         let mut tbf_files = Vec::new();
-
-        let mut archive = Archive::new(File::open(path).unwrap());
-        for file in archive.entries().unwrap() {
-            let mut file = file.unwrap();
-            let path = file.path().unwrap();
-            let file_name = path.file_name().unwrap().to_str().unwrap().to_owned();
-
+        let file = File::open(path).map_err(TockloaderError::UnusableTab)?;
+        let mut archive = Archive::new(file);
+        for file in archive.entries().map_err(TockloaderError::UnusableTab)? {
+            let mut file = file.map_err(TockloaderError::UnusableTab)?;
+            let path = file.path().map_err(TockloaderError::UnusableTab)?;
+            let file_name = match path.file_name().and_then(|name| name.to_str()) {
+                Some(name) => name.to_owned(),
+                None => continue,
+            };
             if file_name == "metadata.toml" {
                 let mut buf = String::new();
-                file.read_to_string(&mut buf).unwrap();
-
-                metadata = Some(Metadata::new(buf).unwrap());
+                file.read_to_string(&mut buf)
+                    .map_err(TockloaderError::UnusableTab)?;
+                metadata = Some(Metadata::new(buf)?);
             } else if file_name.ends_with(".tbf") {
                 let mut data = Vec::new();
-                file.read_to_end(&mut data).unwrap();
 
+                file.read_to_end(&mut data)
+                    .map_err(TockloaderError::UnusableTab)?;
                 tbf_files.push(TbfFile {
                     filename: file_name.to_string(),
                     data,
@@ -44,14 +47,13 @@ impl Tab {
             }
         }
 
-        if metadata.is_none() {
-            panic!("No metadata.toml found in tab");
+        match metadata {
+            Some(metadata) => Ok(Tab {
+                metadata,
+                tbf_files,
+            }),
+            None => Err(TockloaderError::NoMetadata),
         }
-
-        Ok(Tab {
-            metadata: metadata.unwrap(),
-            tbf_files,
-        })
     }
 
     pub fn is_compatible_with_kernel_verison(&self, _kernel_version: u32) -> bool {
@@ -76,6 +78,6 @@ impl Tab {
             }
         }
 
-        panic!("No binary found for architecture {}", arch);
+        Err(TockloaderError::NoBinaryError(arch.to_owned()))
     }
 }

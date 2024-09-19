@@ -28,29 +28,30 @@ impl Connection {
                 let builder = tokio_serial::new(serial_info, 115200);
                 match SerialStream::open(&builder) {
                     Ok(mut port) => {
-                        port.set_parity(Parity::None).unwrap();
-                        port.set_stop_bits(StopBits::One).unwrap();
-                        port.set_flow_control(FlowControl::None).unwrap();
-                        port.set_timeout(Duration::from_millis(500)).unwrap();
-                        port.write_request_to_send(false).unwrap();
-                        port.write_data_terminal_ready(false).unwrap();
+                        port.set_parity(Parity::None)
+                            .map_err(TockloaderError::SerialInitializationError)?;
+                        port.set_stop_bits(StopBits::One)
+                            .map_err(TockloaderError::SerialInitializationError)?;
+                        port.set_flow_control(FlowControl::None)
+                            .map_err(TockloaderError::SerialInitializationError)?;
+                        port.set_timeout(Duration::from_millis(500))
+                            .map_err(TockloaderError::SerialInitializationError)?;
+                        port.write_request_to_send(false)
+                            .map_err(TockloaderError::SerialInitializationError)?;
+                        port.write_data_terminal_ready(false)
+                            .map_err(TockloaderError::SerialInitializationError)?;
                         Ok(Connection::Serial(port))
                     }
-                    Err(_) => {
-                        //TODO(Micu Ana): Add error handling
-                        Err(TockloaderError::NoPortAvailable)
-                    }
+                    Err(e) => Err(TockloaderError::SerialInitializationError(e)),
                 }
             }
             ConnectionInfo::ProbeInfo(probe_info) => {
-                //TODO(Micu Ana): Add error handling
-                let probe = probe_info.open().unwrap();
+                let probe = probe_info
+                    .open()
+                    .map_err(TockloaderError::ProbeRsInitializationError)?;
                 match probe.attach(chip.unwrap(), Permissions::default()) {
                     Ok(session) => Ok(Connection::ProbeRS(session)),
-                    Err(_) => {
-                        //TODO(Micu Ana): Add error handling
-                        Err(TockloaderError::NoPortAvailable)
-                    }
+                    Err(e) => Err(TockloaderError::ProbeRsCommunicationError(e)),
                 }
             }
         }

@@ -96,13 +96,25 @@ impl From<u8> for Response {
 }
 
 #[allow(dead_code)]
-pub async fn toggle_bootloader_entry_dtr_rts(port: &mut SerialStream) {
-    port.write_data_terminal_ready(true).unwrap();
-    port.write_request_to_send(true).unwrap();
+pub async fn toggle_bootloader_entry_dtr_rts(
+    port: &mut SerialStream,
+) -> Result<(), TockloaderError> {
+    port.write_data_terminal_ready(true)
+        .map_err(TockloaderError::SerialInitializationError)?;
+    port.write_request_to_send(true)
+        .map_err(TockloaderError::SerialInitializationError)?;
+
     tokio::time::sleep(Duration::from_millis(100)).await;
-    port.write_data_terminal_ready(false).unwrap();
+
+    port.write_data_terminal_ready(false)
+        .map_err(TockloaderError::SerialInitializationError)?;
+
     tokio::time::sleep(Duration::from_millis(500)).await;
-    port.write_request_to_send(false).unwrap();
+
+    port.write_request_to_send(false)
+        .map_err(TockloaderError::SerialInitializationError)?;
+
+    Ok(())
 }
 
 #[allow(dead_code)]
@@ -113,23 +125,19 @@ pub async fn ping_bootloader_and_wait_for_response(
 
     let mut ret = BytesMut::with_capacity(200);
 
-    for i in 0..30 {
-        println!("Iteration number {}", i);
+    for _ in 0..30 {
         let mut bytes_written = 0;
         while bytes_written != ping_pkt.len() {
             bytes_written += port.write_buf(&mut &ping_pkt[bytes_written..]).await?;
-            println!("Wrote {} bytes", bytes_written);
         }
         let mut read_bytes = 0;
         while read_bytes < 2 {
             read_bytes += port.read_buf(&mut ret).await?;
         }
-        println!("Read {} bytes", read_bytes);
         if ret[1] == Response::Pong as u8 {
             return Ok(Response::from(ret[1]));
         }
     }
-    // TODO(Micu Ana): Add error handling
     Ok(Response::from(ret[1]))
 }
 
@@ -165,14 +173,11 @@ pub async fn issue_command(
         message.insert(2, SYNC_MESSAGE[2]);
     }
 
-    println!("Want to write {} bytes.", message.len());
-
     // Write the command message
     let mut bytes_written = 0;
     while bytes_written != message.len() {
         bytes_written += port.write_buf(&mut &message[bytes_written..]).await?;
     }
-    println!("Wrote {} bytes", bytes_written);
 
     // Response has a two byte header, then response_len bytes
     let bytes_to_read = 2 + response_len;
@@ -183,32 +188,22 @@ pub async fn issue_command(
     while read_bytes < 2 {
         read_bytes += port.read_buf(&mut ret).await?;
     }
-    println!("Read {} bytes", read_bytes);
-    println!("{:?}", ret);
 
     if ret[0] != ESCAPE_CHAR {
-        //TODO(Micu Ana): Add error handling
-        println!("Returning because first character is not escape");
-        return Ok((Response::from(ret[1]), vec![]));
+        return Err(TockloaderError::BootloaderError(ret[0]));
     }
 
     if ret[1] != response_code.clone() as u8 {
-        //TODO(Micu Ana): Add error handling
-        dbg!(ret[1]);
-        dbg!(response_code.clone() as u8);
-        println!("Returning because second character is not response");
-        return Ok((Response::from(ret[1]), vec![]));
+        return Err(TockloaderError::BootloaderError(ret[1]));
     }
 
     let mut new_data: Vec<u8> = Vec::new();
     let mut value = 2;
 
-    dbg!(response_len);
     if response_len != 0 {
         while bytes_to_read > value {
             value += port.read_buf(&mut new_data).await?;
         }
-        dbg!(value);
 
         // De-escape and add array of read in the bytes
         for i in 0..(new_data.len() - 1) {
@@ -218,11 +213,6 @@ pub async fn issue_command(
         }
 
         ret.extend_from_slice(&new_data);
-    }
-
-    if ret.len() != (2 + response_len) {
-        // TODO(Micu Ana): Add error handling
-        return Ok((Response::from(ret[1]), vec![]));
     }
 
     Ok((Response::from(ret[1]), ret[2..].to_vec()))

@@ -2,78 +2,51 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
-use core::fmt;
+use std::io;
 
-#[derive(Debug)]
+use thiserror::Error;
+
+#[derive(Debug, Error)]
 pub enum TockloaderError {
-    TokioSeriallError(tokio_serial::Error),
-    // TODO(NegrilaRares): investigate if we need port
-    #[allow(dead_code)]
-    NoPortAvailable,
-    // TODO(NegrilaRares): investigate if we need port
-    #[allow(dead_code)]
-    CLIError(CLIError),
-    IOError(std::io::Error),
-    JoinError(tokio::task::JoinError),
-}
+    #[error("Error occurred while trying to access core: {0}")]
+    CoreAccessError(usize, probe_rs::Error),
 
-#[derive(Debug)]
-pub enum CLIError {
-    // TODO(NegrilaRares): investigate if we need port
-    #[allow(dead_code)]
-    MultipleInterfaces,
-}
+    #[error("Failed to initialize probe_rs connection due to a communication error. Inner: {0}")]
+    ProbeRsInitializationError(#[from] probe_rs::probe::DebugProbeError),
 
-impl fmt::Display for TockloaderError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            TockloaderError::TokioSeriallError(inner) => {
-                inner.fmt(f)
-            }
-            TockloaderError::NoPortAvailable => {
-                f.write_str("Tockloader has failed to find any open ports. If your device is plugged in, you can manually specify it using the '--port <path>' argument.")
-            },
-            TockloaderError::CLIError(inner) => {
-                inner.fmt(f)
-            }
-            TockloaderError::IOError(inner) => {
-                inner.fmt(f)
-            },
-            TockloaderError::JoinError(inner) => {
-                inner.fmt(f)
-            },
-        }
-    }
-}
+    #[error("Failed to establish communication with board. Inner: {0}")]
+    ProbeRsCommunicationError(probe_rs::Error),
 
-impl fmt::Display for CLIError {
-    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            CLIError::MultipleInterfaces => {
-                //f.write_str("")
-                todo!("TODO (github-username-here): Do we need still need this error?")
-            }
-        }
-    }
-}
+    #[error("Failed to read from debug probe. Inner: {0}")]
+    ProbeRsReadError(probe_rs::Error),
 
-impl From<std::io::Error> for TockloaderError {
-    fn from(value: std::io::Error) -> Self {
-        Self::IOError(value)
-    }
-}
+    #[error("Failed to write binary. Inner: {0}")]
+    ProbeRsWriteError(#[from] probe_rs::flashing::FlashError),
 
-impl From<tokio_serial::Error> for TockloaderError {
-    fn from(value: tokio_serial::Error) -> Self {
-        Self::TokioSeriallError(value)
-    }
-}
+    #[error("Failed to initialize serial connection due to a communication error. Inner: {0}")]
+    SerialInitializationError(#[from] tokio_serial::Error),
 
-impl From<tokio::task::JoinError> for TockloaderError {
-    fn from(value: tokio::task::JoinError) -> Self {
-        Self::JoinError(value)
-    }
-}
+    #[error("Bootloader did not respond properly: {0}")]
+    BootloaderError(u8),
 
-impl std::error::Error for TockloaderError {}
-impl std::error::Error for CLIError {}
+    #[error("No binary found for {0} architecture.")]
+    NoBinaryError(String),
+
+    #[error("App data could not be parsed.")]
+    ParsingError(tbf_parser::types::TbfParseError),
+
+    #[error("Failed to perform read/write operations on serial port. Inner: {0}")]
+    IOError(#[from] io::Error),
+
+    #[error("Expected board attribute to be present")]
+    MisconfiguredBoard(String),
+
+    #[error("Failed to use tab from provided path. Inner: {0}")]
+    UnusableTab(io::Error),
+
+    #[error("Failed to parse metadata. Inner: {0}")]
+    InvalidMetadata(toml::de::Error),
+
+    #[error("No metadata.toml found.")]
+    NoMetadata,
+}

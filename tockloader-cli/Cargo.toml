@@ -25,3 +25,4 @@ tbf-parser = { path = "../tbf-parser"}
 glob = "0.3.1"
 inquire = "0.7.5"
 tockloader-lib = { path = "../tockloader-lib/" }
+anyhow = "1.0.89"
