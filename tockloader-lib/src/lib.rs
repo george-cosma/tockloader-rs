@@ -42,7 +42,7 @@ pub async fn list(
             let mut core = session
                 .core(*core_index.unwrap())
                 .map_err(|e| TockloaderError::CoreAccessError(*core_index.unwrap(), e))?;
-            let system_attributes = SystemAttributes::read_system_attributes_probe(&mut core);
+            let system_attributes = SystemAttributes::read_system_attributes_probe(&mut core)?;
             let appaddr = system_attributes
                 .appaddr
                 .ok_or(TockloaderError::MisconfiguredBoard(
@@ -62,7 +62,7 @@ pub async fn list(
             }
 
             let system_attributes =
-                SystemAttributes::read_system_attributes_serial(&mut port).await;
+                SystemAttributes::read_system_attributes_serial(&mut port).await?;
 
             let appaddr = system_attributes
                 .appaddr
@@ -86,7 +86,7 @@ pub async fn info(
             let mut core = session
                 .core(*core_index.unwrap())
                 .map_err(|e| TockloaderError::CoreAccessError(*core_index.unwrap(), e))?;
-            let system_attributes = SystemAttributes::read_system_attributes_probe(&mut core);
+            let system_attributes = SystemAttributes::read_system_attributes_probe(&mut core)?;
             let appaddr = system_attributes
                 .appaddr
                 .ok_or(TockloaderError::MisconfiguredBoard(
@@ -106,7 +106,7 @@ pub async fn info(
             }
 
             let system_attributes =
-                SystemAttributes::read_system_attributes_serial(&mut port).await;
+                SystemAttributes::read_system_attributes_serial(&mut port).await?;
 
             let appaddr = system_attributes
                 .appaddr
@@ -133,7 +133,7 @@ pub async fn install_app(
                 .core(*core_index.unwrap())
                 .map_err(|e| TockloaderError::CoreAccessError(*core_index.unwrap(), e))?;
             // Get board data
-            let system_attributes = SystemAttributes::read_system_attributes_probe(&mut core);
+            let system_attributes = SystemAttributes::read_system_attributes_probe(&mut core)?;
 
             let board = system_attributes
                 .board
@@ -306,7 +306,7 @@ pub async fn install_app(
             }
 
             let system_attributes =
-                SystemAttributes::read_system_attributes_serial(&mut port).await;
+                SystemAttributes::read_system_attributes_serial(&mut port).await?;
 
             let board = system_attributes
                 .board
