@@ -4,18 +4,24 @@ This is a work-in-progress port to Rust for Tock Loader.
 
 Please use the original Python version of [TockLoader](https://www.github.com/tock/tockloader).
 
-## Roadmap
+## Adding support for a new board
 
-This is a non exhaustive list of functionalities that should be 
-implemented to make TockLoader usable.
+If you want to add support for a new board, you have 3 options:
 
-  - [x] Setup the directory structure
-  - [x] Implement the command line arguments parser
-  - [ ] Implement the serial port listener
-  - [ ] Implement the tockloader serial protocol
-  - [ ] Implement the TBF Parser
+1. Implement support for the bootloader for your board. For this, please see the
+[tock-bootloader](https://github.com/tock/tock-bootloader/tree/master) repo for more details.
+   > Note: this approach will limit you to use the bootloader for all operations (using the
+   > `--serial` flag).
+2. Add support for your board in
+[probe-rs](https://github.com/probe-rs/probe-rs?tab=readme-ov-file#adding-targets). This should be a
+straight-forward process if a CMSIS packs is available for your board.
+3. Implement a custom debug probe for your board. This is the most complex option, but it will give
+you the most flexibility:
+    - First, add your debug probe to the `Connect` enum in `tockloader-lib/src/connection.rs`.
+    - Then, implement each command individually. There is no predefined interface for this, as debug probes
+      can be very different from each other. You can take a look at the existing implementations for inspiration, and feel free to contact us if you need help.
 
-## Install Prerequisites
+## Install Dev Prerequisites
 
 ### Linux
 
@@ -37,9 +43,9 @@ License
 Licensed under either of
 
 - Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or
-  http://www.apache.org/licenses/LICENSE-2.0)
+  <http://www.apache.org/licenses/LICENSE-2.0>)
 - MIT license ([LICENSE-MIT](LICENSE-MIT) or
-  http://opensource.org/licenses/MIT)
+  <http://opensource.org/licenses/MIT>)
 
 at your option.
 
