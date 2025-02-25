@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
-use clap::{arg, crate_version, value_parser, Command};
+use clap::{arg, crate_version, value_parser, ArgGroup, Command};
 
 /// Create the [command](clap::Command) object which will handle all of the command line arguments.
 pub fn make_cli() -> Command {
@@ -23,19 +23,18 @@ fn get_subcommands() -> Vec<Command> {
     vec![
         Command::new("listen")
             .about("Open a terminal to receive UART data")
-            .args(get_app_args())
             .args(get_channel_args())
             .arg_required_else_help(false),
         Command::new("list")
             .about("List and inspect probes")
             .args(get_app_args())
             .args(get_channel_args())
-            .arg_required_else_help(true),
+            .arg_required_else_help(false),
         Command::new("info")
             .about("Verbose information about the connected board")
             .args(get_app_args())
             .args(get_channel_args())
-            .arg_required_else_help(true),
+            .arg_required_else_help(false),
         Command::new("install")
             .about("Install apps")
             .args(get_app_args())
@@ -46,12 +45,13 @@ fn get_subcommands() -> Vec<Command> {
 
 /// Generate all of the [arguments](clap::Arg) that are required by subcommands which work with apps.
 fn get_app_args() -> Vec<clap::Arg> {
+    let probe_args_ids = get_probe_args().into_iter().map(|arg| arg.get_id().clone());
+
     vec![
-        arg!(-a --"app-address" <ADDRESS> "Address where apps are located"),
-        arg!(--force "Allow apps on boards that are not listed as compatible")
-            .action(clap::ArgAction::SetTrue),
-        arg!(--"bundle-apps" "Concatenate apps and flash all together, re-flashing apps as needed")
-            .action(clap::ArgAction::SetTrue),
+        // Default of ProbeTargetInfo: 0x00030000
+        arg!(-a --"app-address" <ADDRESS> "Address where apps are located")
+            .conflicts_with_all(probe_args_ids.clone().collect::<Vec<_>>()),
+        arg!(--tab <TAB> "Specify the path of the tab file"),
     ]
     // Note: the .action(clap::ArgAction::SetTrue) doesn't seem to be necessary, though in clap documentation it is used.
 }
@@ -59,25 +59,90 @@ fn get_app_args() -> Vec<clap::Arg> {
 /// Generate all of the [arguments](clap::Arg) that are required by subcommands which work
 /// with channels and computer-board communication.
 fn get_channel_args() -> Vec<clap::Arg> {
+    let probe_args_ids = get_probe_args_ids().into_iter();
+    let serial_args_ids = get_serial_args_ids().into_iter();
+
+    vec![
+        arg!(--serial "Use the serial bootloader to flash")
+            .action(clap::ArgAction::SetTrue)
+            .conflicts_with_all(probe_args_ids.clone().collect::<Vec<_>>()),
+        arg!(--board <BOARD> "Explicitly specify the board that is being targeted")
+            .conflicts_with_all(
+                serial_args_ids
+                    .clone()
+                    .chain(probe_args_ids.clone())
+                    .collect::<Vec<_>>(),
+            ),
+    ]
+    .into_iter()
+    .chain(get_probe_args().into_iter())
+    .chain(get_serial_args().into_iter())
+    .collect()
+}
+
+fn get_probe_args() -> Vec<clap::Arg> {
+    let serial_args_ids = get_serial_args_ids().into_iter();
+
+    vec![
+        arg!(--chip <CHIP> "Explicitly specify the chip"),
+        // Default of ProbeTargetInfo: 0
+        arg!(--core <CORE> "Explicitly specify the core").value_parser(clap::value_parser!(usize)),
+    ]
+    .into_iter()
+    .map(|arg| arg.conflicts_with_all(serial_args_ids.clone().collect::<Vec<_>>()))
+    .map(|arg| arg.help_heading("Probe Connection Options"))
+    .collect::<Vec<_>>()
+}
+
+fn get_probe_args_ids() -> Vec<clap::Id> {
+    vec!["chip".into(), "core".into()]
+}
+
+fn get_serial_args() -> Vec<clap::Arg> {
+    let probe_args_ids = get_probe_args_ids().into_iter();
+
     vec![
         arg!(-p --port <PORT> "The serial port or device name to use"),
-        arg!(--serial "Use the serial bootloader to flash").action(clap::ArgAction::SetTrue),
-        // -----
-        arg!(--"flash-file" "Operate on a binary flash file instead of a proper board")
-            .action(clap::ArgAction::SetTrue),
-        arg!(--board <BOARD> "Explicitly specify the board that is being targeted"),
-        arg!(--arch <ARCH> "Explicitly specify the architecture of the board that is being targeted"),
-        arg!(--"page-size" <SIZE> "Explicitly specify how many bytes in a flash page")
-            .default_value("0"),
+        // Default of SerialTargetInfo: 115200
         arg!(--"baud-rate" <RATE> "If using serial, set the target baud rate")
-            .value_parser(value_parser!(u32))
-            .default_value("115200"),
-        arg!(--"no-bootloader-entry" "Tell Tockloader to assume the bootloader is already active")
-            .action(clap::ArgAction::SetTrue),
-        arg!(--chip <CHIP> "Explicitly specify the chip"),
-        arg!(--core <CORE> "Explicitly specify the core")
-            .value_parser(clap::value_parser!(usize))
-            .default_value("0"),
-        arg!(--tab <TAB> "Specify the path of the tab file"),
+            .value_parser(value_parser!(u32)),
+        // TODO: add more serial arguments to match with SerialTargetInfo
     ]
+    .into_iter()
+    .map(|arg| arg.conflicts_with_all(probe_args_ids.clone().collect::<Vec<_>>()))
+    .map(|arg| arg.help_heading("Serial Connection Options"))
+    .collect::<Vec<_>>()
+}
+
+fn get_serial_args_ids() -> Vec<clap::Id> {
+    vec!["port".into(), "baud-rate".into()]
+}
+
+mod test {
+    #[test]
+    fn ids_match_with_args() {
+        use super::*;
+
+        let mut probe_args_ids = get_probe_args_ids();
+        let mut serial_args_ids = get_serial_args_ids();
+
+        let mut probe_args = get_probe_args()
+            .into_iter()
+            .map(|arg| arg.get_id().clone())
+            .collect::<Vec<_>>();
+
+        let mut serial_args = get_serial_args()
+            .into_iter()
+            .map(|arg| arg.get_id().clone())
+            .collect::<Vec<_>>();
+
+        probe_args_ids.sort();
+        serial_args_ids.sort();
+
+        probe_args.sort();
+        serial_args.sort();
+
+        assert_eq!(probe_args_ids, probe_args);
+        assert_eq!(serial_args_ids, serial_args);
+    }
 }
