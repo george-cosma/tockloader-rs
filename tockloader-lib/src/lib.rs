@@ -6,6 +6,7 @@ pub mod attributes;
 pub(crate) mod bootloader_serial;
 pub mod connection;
 mod errors;
+pub mod known_boards;
 pub mod tabs;
 
 use std::time::Duration;
