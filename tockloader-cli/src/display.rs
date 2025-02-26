@@ -6,7 +6,7 @@ use tockloader_lib::attributes::{
     app_attributes::AppAttributes, system_attributes::SystemAttributes,
 };
 
-pub async fn print_list(app_details: &mut [AppAttributes]) {
+pub async fn print_list(app_details: &[AppAttributes]) {
     for (i, details) in app_details.iter().enumerate() {
         println!("\n\x1b[0m\x1b[1;35m ┏━━━━━━━━━━━━━━━━┓");
         println!(

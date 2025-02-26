@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
-use clap::{arg, crate_version, value_parser, ArgGroup, Command};
+use clap::{arg, crate_version, error::ErrorKind, value_parser, ArgMatches, Command};
+
+use crate::known_boards::KnownBoardNames;
 
 /// Create the [command](clap::Command) object which will handle all of the command line arguments.
 pub fn make_cli() -> Command {
@@ -84,6 +86,7 @@ fn get_probe_args() -> Vec<clap::Arg> {
     let serial_args_ids = get_serial_args_ids().into_iter();
 
     vec![
+        // Conditionally required via custom validation
         arg!(--chip <CHIP> "Explicitly specify the chip"),
         // Default of ProbeTargetInfo: 0
         arg!(--core <CORE> "Explicitly specify the core").value_parser(clap::value_parser!(usize)),
@@ -116,6 +119,33 @@ fn get_serial_args() -> Vec<clap::Arg> {
 
 fn get_serial_args_ids() -> Vec<clap::Id> {
     vec!["port".into(), "baud-rate".into()]
+}
+
+pub fn validate(cmd: &mut Command, user_options: &ArgMatches) {
+    // Make 'chip' required if not using serial or board
+    if user_options.get_one::<String>("chip").is_none()
+        && !user_options.get_one::<bool>("serial").unwrap_or(&false)
+        && user_options.get_one::<String>("board").is_none()
+    {
+        cmd.error(
+            ErrorKind::MissingRequiredArgument,
+            "the argument '--chip' is required for probe connections when not using a known board.",
+        )
+        .exit();
+    }
+
+    // Make sure 'board' is a known board
+    if let Some(board) = user_options.get_one::<String>("board") {
+        match KnownBoardNames::from_str(&board) {
+            Some(_) => (),
+            None => cmd
+                .error(
+                    ErrorKind::InvalidValue,
+                    "the argument '--board' has an invalid value.",
+                )
+                .exit(),
+        }
+    }
 }
 
 mod test {
