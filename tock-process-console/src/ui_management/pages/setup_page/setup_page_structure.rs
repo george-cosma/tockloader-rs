@@ -4,20 +4,19 @@
 
 use std::vec;
 
-use crate::{
-    state_store::{Action, BoardConnectionStatus, State},
-    ui_management::components::{Component, ComponentRender},
-};
+use crate::state_store::{Action, BoardConnectionStatus, State};
+use crate::ui_management::components::{Component, ComponentRender};
 use crossterm::event::{KeyCode, KeyEventKind, KeyModifiers};
-use ratatui::{
-    layout::{Constraint, Layout},
-    prelude::Direction,
-    style::{Color, Modifier, Style, Stylize},
-    text::Text,
-    widgets::{Block, BorderType, Borders, List, ListDirection, ListState, Paragraph, Wrap},
+use ratatui::layout::{Constraint, Layout};
+use ratatui::prelude::Direction;
+use ratatui::style::{Color, Modifier, Style, Stylize};
+use ratatui::text::Text;
+use ratatui::widgets::{
+    Block, BorderType, Borders, List, ListDirection, ListState, Paragraph, Wrap,
 };
 
-use tokio::sync::{mpsc::UnboundedSender, watch};
+use tokio::sync::mpsc::UnboundedSender;
+use tokio::sync::watch;
 use tokio_serial::SerialPortType;
 
 struct Properties {

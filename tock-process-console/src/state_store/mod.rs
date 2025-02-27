@@ -6,9 +6,7 @@ mod action;
 pub use action::Action;
 
 mod state;
-pub use state::AppData;
-pub use state::BoardConnectionStatus;
-pub use state::State;
+pub use state::{AppData, BoardConnectionStatus, State};
 
 pub mod state_store_process;
 pub use self::state_store_process::StateStore;

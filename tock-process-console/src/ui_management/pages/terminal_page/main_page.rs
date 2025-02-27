@@ -5,23 +5,17 @@
 use std::collections::HashMap;
 
 use crossterm::event::{KeyCode, KeyEventKind, KeyModifiers};
-use ratatui::{
-    layout::{Constraint, Direction, Layout},
-    style::Style,
-    widgets::{Block, Borders, Paragraph, Wrap},
-};
+use ratatui::layout::{Constraint, Direction, Layout};
+use ratatui::style::Style;
+use ratatui::widgets::{Block, Borders, Paragraph, Wrap};
 use tokio::sync::mpsc::UnboundedSender;
 
-use crate::{
-    state_store::{Action, AppData, State},
-    ui_management::components::{Component, ComponentRender},
-};
+use crate::state_store::{Action, AppData, State};
+use crate::ui_management::components::{Component, ComponentRender};
 
-use super::{
-    applications_page::ApplicationsPage,
-    components::apps_list,
-    section::usage::{widget_usage_to_text, UsageInfo, UsageInfoLine},
-};
+use super::applications_page::ApplicationsPage;
+use super::components::apps_list;
+use super::section::usage::{widget_usage_to_text, UsageInfo, UsageInfoLine};
 
 struct Properties {
     // TODO(NegrilaRares): investigate if we need port

@@ -6,10 +6,8 @@ use byteorder::{ByteOrder, LittleEndian};
 use probe_rs::{Core, MemoryInterface};
 use tokio_serial::SerialStream;
 
-use crate::{
-    bootloader_serial::{issue_command, Command, Response},
-    errors::TockloaderError,
-};
+use crate::bootloader_serial::{issue_command, Command, Response};
+use crate::errors::TockloaderError;
 
 use super::decode::{bytes_to_string, decode_attribute};
 

@@ -2,29 +2,23 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
-use std::{
-    collections::HashMap,
-    sync::{Arc, Mutex},
-};
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 
 use crate::ui_management::pages::Component;
 use bytes::Bytes;
 use crossterm::event::{KeyCode, KeyEventKind, MouseEventKind};
-use ratatui::{
-    layout::{Alignment, Rect},
-    style::{Color, Modifier, Style},
-    widgets::block::Block,
-    widgets::{Borders, Paragraph},
-};
+use ratatui::layout::{Alignment, Rect};
+use ratatui::style::{Color, Modifier, Style};
+use ratatui::widgets::block::Block;
+use ratatui::widgets::{Borders, Paragraph};
 use tokio::sync::mpsc::UnboundedSender;
-use tui_term::{vt100::Parser, widget::PseudoTerminal};
+use tui_term::vt100::Parser;
+use tui_term::widget::PseudoTerminal;
 
-use crate::{
-    state_store::{Action, AppData, State},
-    ui_management::{
-        components::ComponentRender, pages::terminal_page::section::SectionActivation,
-    },
-};
+use crate::state_store::{Action, AppData, State};
+use crate::ui_management::components::ComponentRender;
+use crate::ui_management::pages::terminal_page::section::SectionActivation;
 
 #[derive(Clone)]
 struct Properties {

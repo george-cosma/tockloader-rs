@@ -17,7 +17,7 @@ use attributes::general_attributes::GeneralAttributes;
 use attributes::system_attributes::SystemAttributes;
 
 use board_settings::BoardSettings;
-use bootloader_serial::{issue_command, ping_bootloader_and_wait_for_response, Command, Response};
+use bootloader_serial::{ping_bootloader_and_wait_for_response, Response};
 use connection::Connection;
 use probe_rs::flashing::DownloadOptions;
 use probe_rs::probe::DebugProbeInfo;
@@ -239,7 +239,7 @@ pub async fn install_app(
 
             Ok(())
         }
-        Connection::Serial { stream, info } => todo!(),
+        Connection::Serial { stream: _, info: _ } => todo!(),
     }
 }
 

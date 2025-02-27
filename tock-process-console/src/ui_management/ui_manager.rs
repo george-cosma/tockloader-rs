@@ -2,26 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
-use crate::{
-    state_store::{Action, State},
-    termination::Interrupted,
-    ui_management::{
-        components::{Component, ComponentRender},
-        pages::AppRouter,
-    },
-};
+use crate::state_store::{Action, State};
+use crate::termination::Interrupted;
+use crate::ui_management::components::{Component, ComponentRender};
+use crate::ui_management::pages::AppRouter;
 use anyhow::Context;
-use crossterm::{
-    event::{DisableMouseCapture, EnableMouseCapture, Event, EventStream},
-    execute,
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+use crossterm::event::{DisableMouseCapture, EnableMouseCapture, Event, EventStream};
+use crossterm::execute;
+use crossterm::terminal::{
+    disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
 };
-use ratatui::{backend::CrosstermBackend, Terminal};
+use ratatui::backend::CrosstermBackend;
+use ratatui::Terminal;
 use std::io::{self, Stdout};
-use tokio::sync::{
-    broadcast,
-    mpsc::{self, UnboundedReceiver, UnboundedSender},
-};
+use tokio::sync::broadcast;
+use tokio::sync::mpsc::{self, UnboundedReceiver, UnboundedSender};
 use tokio_stream::StreamExt;
 
 pub struct UiManager {

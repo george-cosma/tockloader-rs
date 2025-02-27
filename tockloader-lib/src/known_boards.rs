@@ -1,9 +1,5 @@
-use probe_rs::probe::DebugProbeInfo;
-
-use crate::{
-    board_settings::BoardSettings,
-    connection::{ProbeTargetInfo, SerialTargetInfo},
-};
+use crate::board_settings::BoardSettings;
+use crate::connection::{ProbeTargetInfo, SerialTargetInfo};
 
 pub trait KnownBoard {
     fn serial_target_info(&self) -> SerialTargetInfo;

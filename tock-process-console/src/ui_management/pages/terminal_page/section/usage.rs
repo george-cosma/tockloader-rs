@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
-use ratatui::{
-    style::Stylize,
-    text::{Line, Span, Text},
-};
+use ratatui::style::Stylize;
+use ratatui::text::{Line, Span, Text};
 
 pub struct UsageInfoLine {
     pub keys: Vec<String>,

@@ -2,25 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
-use super::{
-    components::{
-        apps_list::{self, AppsList},
-        terminal_box::{RenderProps, TerminalBox},
-    },
-    section::SectionActivation,
-};
+use super::components::apps_list::{self, AppsList};
+use super::components::terminal_box::{RenderProps, TerminalBox};
+use super::section::SectionActivation;
 
-use crate::{
-    state_store::{Action, AppData, State},
-    ui_management::components::{Component, ComponentRender},
-};
+use crate::state_store::{Action, AppData, State};
+use crate::ui_management::components::{Component, ComponentRender};
 use crossterm::event::{KeyCode, KeyEventKind, KeyModifiers};
-use ratatui::{
-    layout::{Constraint, Direction, Layout},
-    style::Color,
-    text::{Line, Span, Text},
-    widgets::{Block, Borders, Paragraph},
-};
+use ratatui::layout::{Constraint, Direction, Layout};
+use ratatui::style::Color;
+use ratatui::text::{Line, Span, Text};
+use ratatui::widgets::{Block, Borders, Paragraph};
 use std::collections::HashMap;
 use tokio::sync::mpsc::UnboundedSender;
 

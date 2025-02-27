@@ -2,9 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
-use tockloader_lib::attributes::{
-    app_attributes::AppAttributes, system_attributes::SystemAttributes,
-};
+use tockloader_lib::attributes::app_attributes::AppAttributes;
+use tockloader_lib::attributes::system_attributes::SystemAttributes;
 
 pub async fn print_list(app_details: &[AppAttributes]) {
     for (i, details) in app_details.iter().enumerate() {
