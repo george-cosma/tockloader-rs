@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
-use super::{app_attributes::AppAttributes, system_attributes::SystemAttributes};
+use super::app_attributes::AppAttributes;
+use super::system_attributes::SystemAttributes;
 
 #[derive(Debug)]
 pub struct GeneralAttributes {

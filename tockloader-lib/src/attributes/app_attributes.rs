@@ -4,17 +4,13 @@
 
 use probe_rs::{Core, MemoryInterface};
 
-use tbf_parser::{
-    self,
-    parse::{parse_tbf_footer, parse_tbf_header, parse_tbf_header_lengths},
-    types::{TbfFooterV2Credentials, TbfHeader},
-};
+use tbf_parser::parse::{parse_tbf_footer, parse_tbf_header, parse_tbf_header_lengths};
+use tbf_parser::types::{TbfFooterV2Credentials, TbfHeader};
+use tbf_parser::{self};
 use tokio_serial::SerialStream;
 
-use crate::{
-    bootloader_serial::{issue_command, Command, Response},
-    errors::TockloaderError,
-};
+use crate::bootloader_serial::{issue_command, Command, Response};
+use crate::errors::TockloaderError;
 
 #[derive(Debug)]
 pub struct AppAttributes {

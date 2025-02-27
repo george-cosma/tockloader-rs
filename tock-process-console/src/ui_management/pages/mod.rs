@@ -1,7 +1,8 @@
 // Licensed under the Apache License, Version 2.0 or the MIT License.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
-use self::{setup_page::SetupPage, terminal_page::main_page::MainPage};
+use self::setup_page::SetupPage;
+use self::terminal_page::main_page::MainPage;
 use super::components::{Component, ComponentRender};
 use crate::state_store::{Action, BoardConnectionStatus, State};
 use tokio::sync::mpsc::UnboundedSender;

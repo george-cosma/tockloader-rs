@@ -3,15 +3,12 @@
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
 use super::{Action, State};
-use crate::{
-    board::{connection::ConnectionHandler, event::Event},
-    termination::{Interrupted, Terminator},
-};
+use crate::board::connection::ConnectionHandler;
+use crate::board::event::Event;
+use crate::termination::{Interrupted, Terminator};
 use bytes::Bytes;
-use tokio::sync::{
-    broadcast,
-    mpsc::{self, UnboundedReceiver, UnboundedSender},
-};
+use tokio::sync::broadcast;
+use tokio::sync::mpsc::{self, UnboundedReceiver, UnboundedSender};
 
 type ConnectionHandle = (UnboundedReceiver<Event>, UnboundedSender<Bytes>);
 

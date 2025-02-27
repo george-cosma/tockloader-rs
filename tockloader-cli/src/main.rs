@@ -9,15 +9,12 @@ mod known_boards;
 use anyhow::{Context, Result};
 use clap::ArgMatches;
 use cli::make_cli;
-use display::print_list;
 use known_boards::KnownBoardNames;
-use tockloader_lib::{
-    board_settings::BoardSettings,
-    connection::{Connection, ConnectionInfo, ProbeTargetInfo, SerialTargetInfo},
-    known_boards::KnownBoard,
-    list_debug_probes, list_serial_ports,
-    tabs::tab::Tab,
-};
+use tockloader_lib::board_settings::BoardSettings;
+use tockloader_lib::connection::{Connection, ConnectionInfo, ProbeTargetInfo, SerialTargetInfo};
+use tockloader_lib::known_boards::KnownBoard;
+use tockloader_lib::tabs::tab::Tab;
+use tockloader_lib::{list_debug_probes, list_serial_ports};
 
 fn get_serial_target_info(user_options: &ArgMatches) -> SerialTargetInfo {
     let board = get_known_board(user_options);
@@ -60,13 +57,13 @@ fn get_board_settings(user_options: &ArgMatches) -> BoardSettings {
         return board.get_settings();
     }
 
-    let mut result = BoardSettings::default();
+    let result = BoardSettings::default();
 
-    if let Some(strat_address_str) = user_options.get_one::<String>("app-address") {
+    if let Some(_strat_address_str) = user_options.get_one::<String>("app-address") {
         todo!()
     }
 
-    return result;
+    result
 }
 
 fn using_serial(user_options: &ArgMatches) -> bool {
@@ -75,7 +72,7 @@ fn using_serial(user_options: &ArgMatches) -> bool {
 
 fn get_known_board(user_options: &ArgMatches) -> Option<Box<dyn KnownBoard>> {
     user_options.get_one::<String>("board").map(|board| {
-        match KnownBoardNames::from_str(&board).expect("validation to ensure valid board") {
+        match KnownBoardNames::from_str(board).expect("validation to ensure valid board") {
             KnownBoardNames::NucleoF4 => {
                 Box::new(tockloader_lib::known_boards::NucleoF4) as Box<dyn KnownBoard>
             }
@@ -87,21 +84,21 @@ fn get_known_board(user_options: &ArgMatches) -> Option<Box<dyn KnownBoard>> {
 }
 
 fn open_connection(user_options: &ArgMatches) -> Result<Connection> {
-    if using_serial(&user_options) {
+    if using_serial(user_options) {
         let path = if let Some(path) = user_options.get_one::<String>("port") {
             path.clone()
         } else {
             let serial_ports = list_serial_ports().context("Failed to list serial ports.")?;
             let port_names: Vec<_> = serial_ports.iter().map(|p| p.port_name.clone()).collect();
-            let ans = inquire::Select::new("Which serial port do you want to use?", port_names)
+
+            inquire::Select::new("Which serial port do you want to use?", port_names)
                 .prompt()
-                .context("No device is connected.")?;
-            ans
+                .context("No device is connected.")?
         };
 
         Connection::open(ConnectionInfo::SerialInfo(
             path,
-            get_serial_target_info(&user_options),
+            get_serial_target_info(user_options),
         ))
         .context("Failed to open serial connection.")
     } else {
@@ -112,7 +109,7 @@ fn open_connection(user_options: &ArgMatches) -> Result<Connection> {
 
         Connection::open(ConnectionInfo::ProbeInfo(
             ans,
-            get_probe_target_info(&user_options),
+            get_probe_target_info(user_options),
         ))
         .context("Failed to open probe connection.")
     }
@@ -125,16 +122,16 @@ async fn main() -> Result<()> {
 
     match matches.subcommand() {
         Some(("listen", sub_matches)) => {
-            cli::validate(&mut cmd, &sub_matches);
+            cli::validate(&mut cmd, sub_matches);
             tock_process_console::run()
                 .await
                 .context("Failed to run console.")?;
         }
         Some(("list", sub_matches)) => {
-            cli::validate(&mut cmd, &sub_matches);
+            cli::validate(&mut cmd, sub_matches);
 
-            let mut conn = open_connection(&sub_matches)?;
-            let settings = get_board_settings(&sub_matches);
+            let mut conn = open_connection(sub_matches)?;
+            let settings = get_board_settings(sub_matches);
 
             let app_details = tockloader_lib::list(&mut conn, &settings)
                 .await
@@ -143,9 +140,9 @@ async fn main() -> Result<()> {
             display::print_list(&app_details).await;
         }
         Some(("info", sub_matches)) => {
-            cli::validate(&mut cmd, &sub_matches);
-            let mut conn = open_connection(&sub_matches)?;
-            let settings = get_board_settings(&sub_matches);
+            cli::validate(&mut cmd, sub_matches);
+            let mut conn = open_connection(sub_matches)?;
+            let settings = get_board_settings(sub_matches);
 
             let mut attributes = tockloader_lib::info(&mut conn, &settings)
                 .await
@@ -154,12 +151,12 @@ async fn main() -> Result<()> {
             display::print_info(&mut attributes.apps, &mut attributes.system).await;
         }
         Some(("install", sub_matches)) => {
-            cli::validate(&mut cmd, &sub_matches);
+            cli::validate(&mut cmd, sub_matches);
             let tab_file = Tab::open(sub_matches.get_one::<String>("tab").unwrap().to_string())
                 .context("Failed to use provided tab file.")?;
 
-            let mut conn = open_connection(&sub_matches)?;
-            let settings = get_board_settings(&sub_matches);
+            let mut conn = open_connection(sub_matches)?;
+            let settings = get_board_settings(sub_matches);
 
             tockloader_lib::install_app(&mut conn, &settings, tab_file)
                 .await

@@ -1,6 +1,7 @@
 use std::time::Duration;
 
-use probe_rs::{probe::DebugProbeInfo, Permissions, Session};
+use probe_rs::probe::DebugProbeInfo;
+use probe_rs::{Permissions, Session};
 use tokio_serial::{FlowControl, Parity, SerialPort, SerialStream, StopBits};
 
 use crate::errors::TockloaderError;
@@ -45,6 +46,7 @@ impl Default for SerialTargetInfo {
     }
 }
 
+#[allow(clippy::large_enum_variant)]
 pub enum Connection {
     ProbeRS {
         session: Session,
@@ -96,7 +98,7 @@ impl Connection {
 
                 match probe.attach(&target_info.chip, Permissions::default()) {
                     Ok(session) => Ok(Connection::ProbeRS {
-                        session: session,
+                        session,
                         info: target_info,
                     }),
                     Err(e) => Err(TockloaderError::ProbeRsCommunicationError(e)),

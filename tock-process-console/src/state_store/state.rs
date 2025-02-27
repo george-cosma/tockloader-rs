@@ -3,10 +3,8 @@
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
 use circular_queue::CircularQueue;
-use std::{
-    collections::HashMap,
-    sync::{Arc, Mutex},
-};
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 use tui_term::vt100::Parser;
 
 use crate::board;

@@ -2,20 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
-use crate::{
-    state_store::{Action, State},
-    ui_management::{
-        components::{Component, ComponentRender},
-        pages::terminal_page::section::SectionActivation,
-    },
-};
+use crate::state_store::{Action, State};
+use crate::ui_management::components::{Component, ComponentRender};
+use crate::ui_management::pages::terminal_page::section::SectionActivation;
 use crossterm::event::{KeyCode, KeyEventKind};
-use ratatui::{
-    layout::Rect,
-    style::{Color, Modifier, Style},
-    text::{Line, Span},
-    widgets::{Block, Borders, List, ListItem, ListState},
-};
+use ratatui::layout::Rect;
+use ratatui::style::{Color, Modifier, Style};
+use ratatui::text::{Line, Span};
+use ratatui::widgets::{Block, Borders, List, ListItem, ListState};
 use tokio::sync::mpsc::UnboundedSender;
 
 #[derive(Clone)]

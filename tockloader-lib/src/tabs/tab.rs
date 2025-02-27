@@ -4,7 +4,8 @@
 
 use crate::errors::TockloaderError;
 use crate::tabs::metadata::Metadata;
-use std::{fs::File, io::Read};
+use std::fs::File;
+use std::io::Read;
 use tar::Archive;
 
 struct TbfFile {

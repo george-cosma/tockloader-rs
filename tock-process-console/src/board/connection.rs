@@ -4,16 +4,12 @@
 
 use anyhow::Error;
 use bytes::Bytes;
-use tokio::{
-    io::{split, AsyncReadExt, AsyncWriteExt, ReadHalf, WriteHalf},
-    sync::mpsc::{self, UnboundedReceiver, UnboundedSender},
-};
+use tokio::io::{split, AsyncReadExt, AsyncWriteExt, ReadHalf, WriteHalf};
+use tokio::sync::mpsc::{self, UnboundedReceiver, UnboundedSender};
 use tokio_serial::{SerialPortBuilderExt, SerialStream};
 
-use super::{
-    decoder::{BoardMessage, Decoder},
-    event::{Event, NewMessageEvent},
-};
+use super::decoder::{BoardMessage, Decoder};
+use super::event::{Event, NewMessageEvent};
 
 pub struct ConnectionHandler {
     port_reader: ReadHalf<SerialStream>,

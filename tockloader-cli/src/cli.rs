@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
-use clap::{arg, crate_version, error::ErrorKind, value_parser, ArgMatches, Command};
+use clap::error::ErrorKind;
+use clap::{arg, crate_version, value_parser, ArgMatches, Command};
 
 use crate::known_boards::KnownBoardNames;
 
@@ -77,8 +78,8 @@ fn get_channel_args() -> Vec<clap::Arg> {
             ),
     ]
     .into_iter()
-    .chain(get_probe_args().into_iter())
-    .chain(get_serial_args().into_iter())
+    .chain(get_probe_args())
+    .chain(get_serial_args())
     .collect()
 }
 
@@ -136,7 +137,7 @@ pub fn validate(cmd: &mut Command, user_options: &ArgMatches) {
 
     // Make sure 'board' is a known board
     if let Some(board) = user_options.get_one::<String>("board") {
-        match KnownBoardNames::from_str(&board) {
+        match KnownBoardNames::from_str(board) {
             Some(_) => (),
             None => cmd
                 .error(
