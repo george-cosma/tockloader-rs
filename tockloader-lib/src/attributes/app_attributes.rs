@@ -30,6 +30,8 @@ impl TbfFooter {
     }
 }
 
+// TODO(george-cosma): Could take advantages of the trait rework
+
 impl AppAttributes {
     pub(crate) fn new(header_data: TbfHeader, footers_data: Vec<TbfFooter>) -> AppAttributes {
         AppAttributes {

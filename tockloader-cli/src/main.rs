@@ -11,10 +11,15 @@ use clap::ArgMatches;
 use cli::make_cli;
 use known_boards::KnownBoardNames;
 use tockloader_lib::board_settings::BoardSettings;
-use tockloader_lib::connection::{Connection, ConnectionInfo, ProbeTargetInfo, SerialTargetInfo};
+use tockloader_lib::connection::{
+    Connection, ProbeRSConnection, ProbeTargetInfo, SerialConnection, SerialTargetInfo,
+    TockloaderConnection,
+};
 use tockloader_lib::known_boards::KnownBoard;
 use tockloader_lib::tabs::tab::Tab;
-use tockloader_lib::{list_debug_probes, list_serial_ports};
+use tockloader_lib::{
+    list_debug_probes, list_serial_ports, CommandInfo, CommandInstall, CommandList,
+};
 
 fn get_serial_target_info(user_options: &ArgMatches) -> SerialTargetInfo {
     let board = get_known_board(user_options);
@@ -83,7 +88,7 @@ fn get_known_board(user_options: &ArgMatches) -> Option<Box<dyn KnownBoard>> {
     })
 }
 
-fn open_connection(user_options: &ArgMatches) -> Result<Connection> {
+async fn open_connection(user_options: &ArgMatches) -> Result<TockloaderConnection> {
     if using_serial(user_options) {
         let path = if let Some(path) = user_options.get_one::<String>("port") {
             path.clone()
@@ -96,22 +101,27 @@ fn open_connection(user_options: &ArgMatches) -> Result<Connection> {
                 .context("No device is connected.")?
         };
 
-        Connection::open(ConnectionInfo::SerialInfo(
-            path,
-            get_serial_target_info(user_options),
-        ))
-        .context("Failed to open serial connection.")
+        let mut conn: TockloaderConnection =
+            SerialConnection::new(path, get_serial_target_info(user_options)).into();
+        conn.open()
+            .await
+            .context("Failed to open serial connection.")?;
+
+        Ok(conn)
     } else {
         let ans =
             inquire::Select::new("Which debug probe do you want to use?", list_debug_probes())
                 .prompt()
                 .context("No debug probe is connected.")?;
 
-        Connection::open(ConnectionInfo::ProbeInfo(
-            ans,
-            get_probe_target_info(user_options),
-        ))
-        .context("Failed to open probe connection.")
+        let mut conn: TockloaderConnection =
+            ProbeRSConnection::new(ans, get_probe_target_info(user_options)).into();
+
+        conn.open()
+            .await
+            .context("Failed to open probe connection.")?;
+
+        Ok(conn)
     }
 }
 
@@ -130,21 +140,20 @@ async fn main() -> Result<()> {
         Some(("list", sub_matches)) => {
             cli::validate(&mut cmd, sub_matches);
 
-            let mut conn = open_connection(sub_matches)?;
+            let mut conn = open_connection(sub_matches).await?;
             let settings = get_board_settings(sub_matches);
 
-            let app_details = tockloader_lib::list(&mut conn, &settings)
-                .await
-                .context("Failed to list apps.")?;
+            let app_details = conn.list(&settings).await.context("Failed to list apps.")?;
 
             display::print_list(&app_details).await;
         }
         Some(("info", sub_matches)) => {
             cli::validate(&mut cmd, sub_matches);
-            let mut conn = open_connection(sub_matches)?;
+            let mut conn = open_connection(sub_matches).await?;
             let settings = get_board_settings(sub_matches);
 
-            let mut attributes = tockloader_lib::info(&mut conn, &settings)
+            let mut attributes = conn
+                .info(&settings)
                 .await
                 .context("Failed to get data from the board.")?;
 
@@ -155,10 +164,10 @@ async fn main() -> Result<()> {
             let tab_file = Tab::open(sub_matches.get_one::<String>("tab").unwrap().to_string())
                 .context("Failed to use provided tab file.")?;
 
-            let mut conn = open_connection(sub_matches)?;
+            let mut conn = open_connection(sub_matches).await?;
             let settings = get_board_settings(sub_matches);
 
-            tockloader_lib::install_app(&mut conn, &settings, tab_file)
+            conn.install_app(&settings, tab_file)
                 .await
                 .context("Failed to install app.")?;
         }
