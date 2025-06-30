@@ -5,6 +5,8 @@
 use tockloader_lib::attributes::app_attributes::AppAttributes;
 use tockloader_lib::attributes::system_attributes::SystemAttributes;
 
+// TODO(george-cosma): Fix this
+#[allow(clippy::uninlined_format_args)]
 pub async fn print_list(app_details: &[AppAttributes]) {
     for (i, details) in app_details.iter().enumerate() {
         println!("\n\x1b[0m\x1b[1;35m ┏━━━━━━━━━━━━━━━━┓");
@@ -40,6 +42,8 @@ pub async fn print_list(app_details: &[AppAttributes]) {
     }
 }
 
+// TODO(george-cosma): Fix this
+#[allow(clippy::uninlined_format_args)]
 pub async fn print_info(app_details: &mut [AppAttributes], system_details: &mut SystemAttributes) {
     for (i, details) in app_details.iter().enumerate() {
         println!("\n\x1b[0m\x1b[1;35m ┏━━━━━━━━━━━━━━━━┓");
