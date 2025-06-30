@@ -131,7 +131,7 @@ impl CommandInstall for ProbeRSConnection {
         }
 
         for i in valid_pages {
-            println!("Writing page number {}", i);
+            println!("Writing page number {i}");
             // Create the packet that we send to the bootloader. First four
             // bytes are the address of the page
             let mut pkt = Vec::new();

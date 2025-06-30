@@ -207,7 +207,7 @@ impl ComponentRender<()> for SetupPage {
 
         let available_ports = match tokio_serial::available_ports() {
             Ok(ports) => ports,
-            Err(error) => panic!("Error while searching for ports: {}", error),
+            Err(error) => panic!("Error while searching for ports: {error}"),
         };
 
         let mut vec_serial: Vec<Text> = vec![];
@@ -261,7 +261,7 @@ impl ComponentRender<()> for SetupPage {
                         .borders(Borders::ALL)
                         .border_type(BorderType::Rounded)
                         .fg(Color::Yellow)
-                        .title(format!(" Number of boards found: {}  ", boards_found))
+                        .title(format!(" Number of boards found: {boards_found}  "))
                         .title_style(Style::default().fg(Color::Blue)),
                 )
                 .highlight_style(Style::default().add_modifier(Modifier::BOLD))
@@ -275,12 +275,12 @@ impl ComponentRender<()> for SetupPage {
         if self.show_state == ShowState::ShowBoardsOnly {
             match self.probeinfo_sender.send(board_ports) {
                 Ok(data) => data,
-                Err(error) => println!("{}", error),
+                Err(error) => println!("{error}"),
             };
         } else if self.show_state == ShowState::ShowAllSerialPorts {
             match self.probeinfo_sender.send(serial_ports) {
                 Ok(data) => data,
-                Err(error) => println!("{}", error),
+                Err(error) => println!("{error}"),
             };
         }
 
@@ -374,7 +374,7 @@ impl ComponentRender<()> for SetupPage {
         frame.render_widget(help_text, help_text_h);
 
         let error = if let Some(error) = &self.properties.error_message {
-            Text::from(format!("Error: {}", error))
+            Text::from(format!("Error: {error}"))
         } else {
             Text::from("")
         };
