@@ -3,11 +3,18 @@
 // Copyright OXIDOS AUTOMOTIVE 2024.
 
 use std::io;
-
 use thiserror::Error;
+
+// TODO(george-cosma): Split this. Possibly each meta-function (install, list,
+// ...) should have its own error type + error type for connection. We can have
+// more detailed errors as "sources" for more generic error types, if we TRULY
+// need to know why probe-rs failed. Or serial.
 
 #[derive(Debug, Error)]
 pub enum TockloaderError {
+    #[error("Failed due to the connection not being open.")]
+    ConnectionNotOpen,
+
     #[error("Error occurred while trying to access core: {0}")]
     CoreAccessError(usize, probe_rs::Error),
 
