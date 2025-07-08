@@ -1,0 +1,51 @@
+name: Deploy mdBook to GitHub Pages (With PR Preview)
+
+on:
+  push:
+    branches:
+      - main
+      - gh-pages
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install mdBook if missing
+        run: |
+          if ! command -v mdbook >/dev/null; then
+            echo "mdbook not found, installing..."
+            cargo install mdbook --version "^0.4"
+          else
+            echo "mdbook is already installed"
+          fi
+
+      - name: Build mdBook
+        run: mdbook build docs
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs/book
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.action == 'opened' || github.event.action == 'synchronize'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
