@@ -12,6 +12,12 @@ ci-job-clippy:
 	@echo "Running clippy on source files..."
 	@./tools/run_clippy.sh
 
+.PHONY: ci-job-mdbook
+ci-job-mdbook:
+	@echo "Installing mdBook if necessary and building docs..."
+	@cargo install mdbook --version "^0.4" --force
+	@mdbook build docs
+
 .PHONY: ci-runner-github
 ci-runner-github: ci-job-format ci-job-clippy
 	@echo "Running cargo check..."
