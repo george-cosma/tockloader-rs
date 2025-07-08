@@ -24,3 +24,10 @@ ci-runner-github: ci-job-format ci-job-clippy ci-job-mdbook
 	@cargo check
 	@echo "Running tests..."
 	@cargo test
+
+.PHONY: ci-mdbook-job
+ci-job-mdbook:
+	@echo "Installing mdBook if necessary and building docs..."
+	@cargo install mdbook --version "^0.4" --force
+	@mdbook build docs
+
