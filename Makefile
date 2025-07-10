@@ -15,7 +15,7 @@ ci-job-clippy:
 .PHONY: ci-job-mdbook
 ci-job-mdbook:
 	@echo "Installing mdBook if necessary and building docs..."
-	@cargo install mdbook --version "^0.4" --force
+	@which mdbook >/dev/null 2>&1 || cargo install mdbook
 	@mdbook build docs
 
 .PHONY: ci-runner-github
