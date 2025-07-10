@@ -4,7 +4,7 @@
 
 .PHONY: ci-job-format
 ci-job-format:
-	@echo "Checking formating of source files..."
+	@echo "Checking formatting of source files..."
 	@./tools/run_fmt_check.sh
 
 .PHONY: ci-job-clippy
@@ -19,7 +19,7 @@ ci-job-mdbook:
 	@mdbook build docs
 
 .PHONY: ci-runner-github
-ci-runner-github: ci-job-format ci-job-clippy
+ci-runner-github: ci-job-format ci-job-clippy ci-job-mdbook
 	@echo "Running cargo check..."
 	@cargo check
 	@echo "Running tests..."
