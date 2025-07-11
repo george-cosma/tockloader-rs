@@ -1,8 +1,8 @@
 [book]
-authors = ["Aliwi.Walid"]
+authors = ["Tockloader-rs Contributors"]
 language = "en"
 src = "src"
 title = "Tockloader-rs Dev Notes"
 
 [output.html]
-site-url = "./"
+site-url = "{{SITE_URL}}"
