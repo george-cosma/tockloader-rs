@@ -1,0 +1,22 @@
+# Licensed under the Apache License, Version 2.0 or the MIT License.
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+# Copyright OXIDOS AUTOMOTIVE 2024.
+
+[package]
+name = "tockloader-lib"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.32.0", features = ["full"] }
+tokio-serial = {version = "5.4.4", features = ["libudev"]}
+probe-rs = "0.24.0"
+tbf-parser = { path = "../tbf-parser"}
+utf8-decode = "1.0.1"
+byteorder = "1.5.0"
+tar = "0.4.41"
+bytes = "1.7.1"
+toml = "0.8.19"
+serde = { version = "1.0.210", features = ["derive"] }
+thiserror = "1.0.63"
+async-trait = "0.1.88"

@@ -1,0 +1,32 @@
+name: mdBook PR Preview
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+    paths:
+      - "docs/**"
+      - ".github/workflows/preview-mdbook.yml"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency: preview-${{ github.ref }}
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install mdBook
+        run: cargo install mdbook
+
+      - name: Build mdBook
+        run: mdbook build docs
+
+      - name: Deploy PR Preview
+        uses: rossjrw/pr-preview-action@v1.4.7
+        with:
+          source-dir: docs/book
+          umbrella-dir: docs/pr-preview
