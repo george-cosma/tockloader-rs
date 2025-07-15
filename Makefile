@@ -15,9 +15,10 @@ ci-job-clippy:
 .PHONY: ci-job-mdbook
 ci-job-mdbook:
 	@echo "Generating book.toml..."
+	@echo "Installing mdBook"
+	@which mdbook >/dev/null 2>&1 || cargo install mdbook --locked
+	@echo "Building docs"
 	@./tools/gen_book_toml.sh ci
-	@echo "Installing mdBook if necessary and building docs..."
-	@which mdbook >/dev/null 2>&1 || cargo install mdbook
 	@mdbook build docs
 
 .PHONY: ci-runner-github

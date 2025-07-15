@@ -1,0 +1,5 @@
+[book]
+authors = ["Tockloader-rs Contributors"]
+language = "en"
+src = "src"
+title = "Tockloader-rs Dev Notes"

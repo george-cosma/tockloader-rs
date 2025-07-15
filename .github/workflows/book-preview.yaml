@@ -2,7 +2,7 @@ name: mdBook PR Preview
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [opened, reopened, synchronize, closed]
     paths:
       - "docs/**"
       - ".github/workflows/preview-mdbook.yml"
@@ -24,9 +24,6 @@ jobs:
 
       - name: Build mdBook
         run: mdbook build docs
-
-      - name: Generate book.toml for preview
-        run: ./tools/gen_book_toml.sh preview ${{ github.event.number }}
 
       - name: Deploy PR Preview
         uses: rossjrw/pr-preview-action@v1.4.7
