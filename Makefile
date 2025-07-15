@@ -12,6 +12,7 @@ ci-job-clippy:
 	@echo "Running clippy on source files..."
 	@./tools/run_clippy.sh
 
+.PHONY: ci-job-mdbook
 ci-job-mdbook:
 	@echo "Generating book.toml..."
 	@./tools/gen_book_toml.sh ci
